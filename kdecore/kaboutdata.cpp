@@ -294,23 +294,23 @@ KAboutData::license() const
        return( i18n(mLicenseText) );
     case License_GPL_V2:  
        l = "GPL v2";
-       f = locate("data", "LICENSES/GPL_V2");
+       f = locate("data", "licenses/kde2/GPL_V2");
        break;
     case License_LGPL_V2:  
        l = "LGPL v2";
-       f = locate("data", "LICENSES/LGPL_V2"); 
+       f = locate("data", "licenses/kde2/LGPL_V2");
        break;
     case License_BSD:  
        l = "BSD License"; 
-       f = locate("data", "LICENSES/BSD");
+       f = locate("data", "licenses/kde2/BSD");
        break;
     case License_Artistic:  
        l = "Artistic License"; 
-       f = locate("data", "LICENSES/ARTISTIC");
+       f = locate("data", "licenses/kde2/ARTISTIC");
        break;
     case License_QPL_V1_0:  
        l = "QPL v1.0"; 
-       f = locate("data", "LICENSES/QPL_V1.0");
+       f = locate("data", "licenses/kde2/QPL_V1.0");
        break;
     default: 
        return i18n("No licensing terms for this program have been specified.\n"
