@@ -351,7 +351,7 @@ void AudioIOALSA::watchDescriptors(poll_descriptors *pds)
 	for(int i=0; i<pds->nfds; i++) {
 	        // Check in which direction this handle is supposed to be watched
 		int types = poll2iomanager(pds->pfds[i].events);
-		Dispatcher::the()->ioManager()->watchFD(pds->pfds[i].fd, types | IOType::reentrant, this);
+                Dispatcher::the()->ioManager()->watchFD(pds->pfds[i].fd, types, this);
 	}
 }
 
