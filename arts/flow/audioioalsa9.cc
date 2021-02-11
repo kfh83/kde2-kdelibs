@@ -71,7 +71,9 @@ protected:
 	snd_pcm_format_t m_format;
 	int m_period_size, m_periods;
         bool inProgress;
+	bool restartIOHandling;
 
+        void startIO();
         int poll2iomanager(int pollTypes);
 	int setPcmParams(snd_pcm_t *pcm);
 	int watchDescriptor(snd_pcm_t *pcm);
@@ -119,6 +121,8 @@ AudioIOALSA::AudioIOALSA()
         m_pcm_playback = NULL;
 	m_pcm_capture = NULL;
         inProgress = false;
+        restartIOHandling = false;
+	audio_read_fd = audio_write_fd = -1;
 }
 
 bool AudioIOALSA::open()
@@ -197,17 +201,9 @@ bool AudioIOALSA::open()
 		  (float)(_fragmentSize*_fragmentCount) /
 		  (float)(2.0 * _samplingRate * _channels)*1000.0);
 
-  	/* watch PCM file descriptor(s) */
-	Dispatcher::the()->ioManager()->remove(this, IOType::all);
-	audio_read_fd = audio_write_fd = -1;
-	if (_direction & directionWrite) {
-		audio_write_fd = watchDescriptor(m_pcm_playback);
-        }
-	if (_direction & directionRead) {
-		audio_read_fd = watchDescriptor(m_pcm_capture);
-        }
 
-	/* restore the format value */
+	startIO();
+        /* restore the format value */
 	switch (m_format) {
 	case SND_PCM_FORMAT_S16_LE:
 		_format = 16;
@@ -302,6 +298,18 @@ int AudioIOALSA::getParam(AudioParam p)
 	}
 }
 
+void AudioIOALSA::startIO()
+{
+        /* watch PCM file descriptor(s) */
+	if (m_pcm_playback) {
+		audio_write_fd = watchDescriptor(m_pcm_playback);
+        }
+	if (m_pcm_capture) {
+		audio_read_fd = watchDescriptor(m_pcm_capture);
+        }
+
+}
+
 int AudioIOALSA::poll2iomanager(int pollTypes)
 {
 	int types = 0;
@@ -343,8 +351,7 @@ int AudioIOALSA::xrun(snd_pcm_t *pcm)
 	artsdebug("xrun!!\n");
 	if ((err = snd_pcm_prepare(pcm)) < 0)
 		return err;
-	if (pcm == m_pcm_capture)
-		snd_pcm_start(pcm); // ignore error here..
+	snd_pcm_start(pcm); // ignore error here..
 	return 0;
 }
 
@@ -358,8 +365,7 @@ int AudioIOALSA::resume(snd_pcm_t *pcm)
 	if (err < 0) {
 		if ((err = snd_pcm_prepare(pcm)) < 0)
 			return err;
-		if (pcm == m_pcm_capture)
-			snd_pcm_start(pcm); // ignore error here..
+		snd_pcm_start(pcm); // ignore error here..
 	}
 	return 0;
 }
@@ -386,7 +392,11 @@ int AudioIOALSA::read(void *buffer, int size)
 
 int AudioIOALSA::write(void *buffer, int size)
 {
-	int frames = snd_pcm_bytes_to_frames(m_pcm_playback, size);
+        // DMix has an annoying habit of returning instantantly on the returned
+        // poll-descriptor. So we block here to avoid an infinity loop.
+        while(snd_pcm_wait(m_pcm_playback, 1) == 0);
+
+        int frames = snd_pcm_bytes_to_frames(m_pcm_playback, size);
 	int length;
 	while ((length = snd_pcm_writei(m_pcm_playback, buffer, frames)) < 0) {
 		if (length == -EPIPE)
@@ -405,21 +415,31 @@ int AudioIOALSA::write(void *buffer, int size)
 
 void AudioIOALSA::notifyIO(int fd, int type)
 {
-    int todo = 0;
+        int todo = 0;
 
-    if (inProgress) return;
+	if(inProgress)
+	{
+		if(!restartIOHandling)
+		{
+			Dispatcher::the()->ioManager()->remove(this,IOType::all);
+			restartIOHandling = true;
+		}
+		return;
+	}
 
-    // We can't trust the type as ALSA might have read-type events,
-    // that are really meant to be write-type event!
-    if(fd == audio_write_fd) todo |= AudioSubSystem::ioWrite;
-    if(fd == audio_read_fd) todo |= AudioSubSystem::ioRead;
+	// We can't trust the type as ALSA might have read-type events,
+	// that are really meant to be write-type event!
+        if(fd == audio_write_fd) todo |= AudioSubSystem::ioWrite;
+        if(fd == audio_read_fd) todo |= AudioSubSystem::ioRead;
 
-    if (type & IOType::except) todo |= AudioSubSystem::ioExcept;
+        if (type & IOType::except) todo |= AudioSubSystem::ioExcept;
 
-    inProgress = true;
-    AudioSubSystem::the()->handleIO(todo);
-    inProgress = false;
+        restartIOHandling = false;
+        inProgress = true;
+        AudioSubSystem::the()->handleIO(todo);
+        inProgress = false;
 
+        if (restartIOHandling) startIO();
 }
 
 int AudioIOALSA::setPcmParams(snd_pcm_t *pcm)
