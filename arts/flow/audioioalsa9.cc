@@ -259,10 +259,8 @@ void AudioIOALSA::setParam(AudioParam p, int& value)
 
 int AudioIOALSA::getParam(AudioParam p)
 {
-	snd_pcm_status_t *status;
-	snd_pcm_status_alloca(&status);
-
 	switch(p) {
+		/*
 	case canRead:
 		if (! m_pcm_capture) return -1;
 		if (snd_pcm_status(m_pcm_capture, status) < 0) {
@@ -278,6 +276,14 @@ int AudioIOALSA::getParam(AudioParam p)
 			return -1;
 		}
 		return snd_pcm_frames_to_bytes(m_pcm_playback, snd_pcm_status_get_avail(status));
+                */
+	case canRead:
+		if (! m_pcm_capture) return -1;
+		return snd_pcm_frames_to_bytes(m_pcm_capture, snd_pcm_avail_update(m_pcm_capture));
+
+	case canWrite:
+		if (! m_pcm_playback) return -1;
+		return snd_pcm_frames_to_bytes(m_pcm_playback, snd_pcm_avail_update(m_pcm_playback));
 
 	case selectFD:
 		return -1;
@@ -394,7 +400,7 @@ int AudioIOALSA::write(void *buffer, int size)
 {
         // DMix has an annoying habit of returning instantantly on the returned
         // poll-descriptor. So we block here to avoid an infinity loop.
-        while(snd_pcm_wait(m_pcm_playback, 1) == 0);
+        snd_pcm_wait(m_pcm_playback, 1);
 
         int frames = snd_pcm_bytes_to_frames(m_pcm_playback, size);
 	int length;
@@ -410,7 +416,11 @@ int AudioIOALSA::write(void *buffer, int size)
 			return -1;
 		}
 	}
-	return snd_pcm_frames_to_bytes(m_pcm_playback, length);
+
+	if (length == frames) // Yet another DMix work-around
+		return size;
+	else
+	        return snd_pcm_frames_to_bytes(m_pcm_playback, length);
 }
 
 void AudioIOALSA::notifyIO(int fd, int type)
