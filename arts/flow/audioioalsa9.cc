@@ -1,6 +1,7 @@
     /*
 
     Copyright (C) 2001 Takashi Iwai <tiwai@suse.de>
+    Copyright (C) 2004 Allan Sandfeld Jensen <kde@carewolf.com>
 
     based on audioalsa.cc:
     Copyright (C) 2000,2001 Jozef Kosoru
@@ -12,12 +13,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-   
+
     You should have received a copy of the GNU Library General Public License
     along with this library; see the file COPYING.LIB.  If not, write to
     the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -54,23 +55,29 @@
 
 #include "debug.h"
 #include "audioio.h"
+#include "audiosubsys.h"
+#include "dispatcher.h"
+#include "iomanager.h"
 
 namespace Arts {
 
-class AudioIOALSA : public AudioIO {
+class AudioIOALSA : public AudioIO, public IONotify  {
 protected:
 	int audio_read_fd;
 	int audio_write_fd;
-	int requestedFragmentSize;
-	int requestedFragmentCount;
 
-	snd_pcm_t *m_pcm_playback;
+        snd_pcm_t *m_pcm_playback;
 	snd_pcm_t *m_pcm_capture;
 	snd_pcm_format_t m_format;
-	int m_period_size, m_buffer_size;
+	int m_period_size, m_periods;
+        bool inProgress;
 
+        int poll2iomanager(int pollTypes);
 	int setPcmParams(snd_pcm_t *pcm);
-	int getDescriptor(snd_pcm_t *pcm);
+	int watchDescriptor(snd_pcm_t *pcm);
+
+        void notifyIO(int fd, int types);
+
 	int xrun(snd_pcm_t *pcm);
 #ifdef HAVE_SND_PCM_RESUME
 	int resume(snd_pcm_t *pcm);
@@ -98,20 +105,25 @@ AudioIOALSA::AudioIOALSA()
 {
  	param(samplingRate) = 44100;
 	paramStr(deviceName) = "default"; // ALSA pcm device name - not file name
-	requestedFragmentSize = param(fragmentSize) = 2048;
-	requestedFragmentCount = param(fragmentCount) = 7;
+	param(fragmentSize) = 2048;
+	param(fragmentCount) = 7;
 	param(channels) = 2;
 	param(direction) = directionWrite;
 
+        param(format) = 16;
 	/*
 	 * default parameters
 	 */
 	m_format = SND_PCM_FORMAT_S16_LE;
+
+        m_pcm_playback = NULL;
+	m_pcm_capture = NULL;
+        inProgress = false;
 }
 
 bool AudioIOALSA::open()
 {
-	string& _error = paramStr(lastError);
+        string& _error = paramStr(lastError);
 	string& _deviceName = paramStr(deviceName);
 	int& _channels = param(channels);
 	int& _fragmentSize = param(fragmentSize);
@@ -172,10 +184,6 @@ bool AudioIOALSA::open()
 	/* check device capabilities */
 	// checkCapabilities();
 
-	/* set the fragment settings to what the user requested */
-	_fragmentSize = requestedFragmentSize;
-	_fragmentCount = requestedFragmentCount;
-
 	/* set PCM communication parameters */
 	if (((_direction & directionWrite) && setPcmParams(m_pcm_playback)) ||
 	    ((_direction & directionRead) && setPcmParams(m_pcm_capture))) {
@@ -189,12 +197,15 @@ bool AudioIOALSA::open()
 		  (float)(_fragmentSize*_fragmentCount) /
 		  (float)(2.0 * _samplingRate * _channels)*1000.0);
 
-  	/* obtain PCM file descriptor(s) */
+  	/* watch PCM file descriptor(s) */
+	Dispatcher::the()->ioManager()->remove(this, IOType::all);
 	audio_read_fd = audio_write_fd = -1;
-	if (_direction & directionWrite)
-		audio_write_fd = getDescriptor(m_pcm_playback);
-	if (_direction & directionRead)
-		audio_read_fd = getDescriptor(m_pcm_capture);
+	if (_direction & directionWrite) {
+		audio_write_fd = watchDescriptor(m_pcm_playback);
+        }
+	if (_direction & directionRead) {
+		audio_read_fd = watchDescriptor(m_pcm_capture);
+        }
 
 	/* restore the format value */
 	switch (m_format) {
@@ -207,43 +218,47 @@ bool AudioIOALSA::open()
 	case SND_PCM_FORMAT_U8:
 		_format =  8;
 		break;
+        default:
+            _error = "Unknown PCM format";
+            return false;
 	}
 
   	/* start recording */
 	if (_direction & directionRead)
 		snd_pcm_start(m_pcm_capture);
+  	/* enable playing (needed for dmix) */
+	if (_direction & directionWrite)
+		snd_pcm_start(m_pcm_playback);
 
   	return true;
 }
 
 void AudioIOALSA::close()
 {
+        arts_debug("Closing ALSA-driver");
 	int& _direction = param(direction);
 	if ((_direction & directionRead) && m_pcm_capture) {
-		(void)snd_pcm_drain(m_pcm_capture);
+		(void)snd_pcm_drop(m_pcm_capture);
 		(void)snd_pcm_close(m_pcm_capture);
 		m_pcm_capture = NULL;
 	}
 	if ((_direction & directionWrite) && m_pcm_playback) {
-		(void)snd_pcm_drain(m_pcm_playback);
+		(void)snd_pcm_drop(m_pcm_playback);
 		(void)snd_pcm_close(m_pcm_playback);
 		m_pcm_playback = NULL;
 	}
+	Dispatcher::the()->ioManager()->remove(this, IOType::all);
 }
 
 void AudioIOALSA::setParam(AudioParam p, int& value)
 {
-	switch(p) {
-	case fragmentSize:
-		param(p) = requestedFragmentSize = value;
-		break;
-	case fragmentCount:
-		param(p) = requestedFragmentCount = value;
-		break;
-	default:
-		param(p) = value;
-		break;
-	}
+	param(p) = value;
+        if (m_pcm_playback != NULL) {
+            setPcmParams(m_pcm_playback);
+        }
+        if (m_pcm_capture != NULL) {
+            setPcmParams(m_pcm_capture);
+        }
 }
 
 int AudioIOALSA::getParam(AudioParam p)
@@ -269,7 +284,8 @@ int AudioIOALSA::getParam(AudioParam p)
 		return snd_pcm_frames_to_bytes(m_pcm_playback, snd_pcm_status_get_avail(status));
 
 	case selectFD:
-		return audio_write_fd;
+		return -1;
+		//return audio_write_fd;
 		//return audio_read_fd;
 
 	case autoDetect:
@@ -286,13 +302,38 @@ int AudioIOALSA::getParam(AudioParam p)
 	}
 }
 
-int AudioIOALSA::getDescriptor(snd_pcm_t *pcm)
+int AudioIOALSA::poll2iomanager(int pollTypes)
 {
-	struct pollfd pfds;
-	if (snd_pcm_poll_descriptors(pcm, &pfds, 1) < 0) {
+	int types = 0;
+
+	if(pollTypes & POLLIN)
+		types |= IOType::read;
+	if(pollTypes & POLLOUT)
+		types |= IOType::write;
+	if(pollTypes & POLLERR)
+		types |= IOType::except;
+
+	return types;
+}
+
+int AudioIOALSA::watchDescriptor(snd_pcm_t *pcm)
+{
+        struct pollfd pfds;
+        if (snd_pcm_poll_descriptors_count(pcm) != 1) {
+		arts_info("Can't handle more than one poll descriptor\n");
+		return -1;
+        }
+        if (snd_pcm_poll_descriptors(pcm, &pfds, 1) != 1) {
 		arts_info("Cannot get poll descriptor\n");
 		return -1;
 	}
+
+        // See though the crack-fumes from the ALSA-developers and try to
+        // figure out which way this handle is supposed to be polled.
+        int types = poll2iomanager(pfds.events);
+
+        Dispatcher::the()->ioManager()->watchFD(pfds.fd, types, this);
+
 	return pfds.fd;
 }
 
@@ -311,6 +352,7 @@ int AudioIOALSA::xrun(snd_pcm_t *pcm)
 int AudioIOALSA::resume(snd_pcm_t *pcm)
 {
 	int err;
+	artsdebug("resume!\n");
 	while ((err = snd_pcm_resume(pcm)) == -EAGAIN)
 		sleep(1); /* wait until suspend flag is not released */
 	if (err < 0) {
@@ -361,6 +403,25 @@ int AudioIOALSA::write(void *buffer, int size)
 	return snd_pcm_frames_to_bytes(m_pcm_playback, length);
 }
 
+void AudioIOALSA::notifyIO(int fd, int type)
+{
+    int todo = 0;
+
+    if (inProgress) return;
+
+    // We can't trust the type as ALSA might have read-type events,
+    // that are really meant to be write-type event!
+    if(fd == audio_write_fd) todo |= AudioSubSystem::ioWrite;
+    if(fd == audio_read_fd) todo |= AudioSubSystem::ioRead;
+
+    if (type & IOType::except) todo |= AudioSubSystem::ioExcept;
+
+    inProgress = true;
+    AudioSubSystem::the()->handleIO(todo);
+    inProgress = false;
+
+}
+
 int AudioIOALSA::setPcmParams(snd_pcm_t *pcm)
 {
 	int &_samplingRate = param(samplingRate);
@@ -378,14 +439,16 @@ int AudioIOALSA::setPcmParams(snd_pcm_t *pcm)
 		return 1;
 	}
 	if (m_format == SND_PCM_FORMAT_UNKNOWN) {
-		// test the available format
-		// try 16bit first, then fall back to 8bit 
+		// test the available formats
+		// try 16bit first, then fall back to 8bit
 		if (! snd_pcm_hw_params_test_format(pcm, hw, SND_PCM_FORMAT_S16_LE))
 			m_format = SND_PCM_FORMAT_S16_LE;
 		else if (! snd_pcm_hw_params_test_format(pcm, hw, SND_PCM_FORMAT_S16_BE))
 			m_format = SND_PCM_FORMAT_S16_BE;
-		else
+		else if (! snd_pcm_hw_params_test_format(pcm, hw, SND_PCM_FORMAT_U8))
 			m_format = SND_PCM_FORMAT_U8;
+                else
+                        m_format = SND_PCM_FORMAT_UNKNOWN;
 	}
 	if (snd_pcm_hw_params_set_format(pcm, hw, m_format) < 0) {
 		_error = "Unable to set format!";
@@ -394,7 +457,7 @@ int AudioIOALSA::setPcmParams(snd_pcm_t *pcm)
 
 	unsigned int rate = snd_pcm_hw_params_set_rate_near(pcm, hw, _samplingRate, 0);
 	const unsigned int tolerance = _samplingRate/10+1000;
-	if (abs((int)rate - (int)_samplingRate) > tolerance) {
+	if (abs((int)rate - (int)_samplingRate) > (int)tolerance) {
 		_error = "Can't set requested sampling rate!";
 		char details[80];
 		sprintf(details," (requested rate %d, got rate %d)",
@@ -413,27 +476,28 @@ int AudioIOALSA::setPcmParams(snd_pcm_t *pcm)
 	if (m_format != SND_PCM_FORMAT_U8)
 		m_period_size <<= 1;
 	if (_channels > 1)
-		m_period_size /= _channels;
+	m_period_size /= _channels;
 	if ((m_period_size = snd_pcm_hw_params_set_period_size_near(pcm, hw, m_period_size, 0)) < 0) {
 		_error = "Unable to set period size!";
 		return 1;
 	}
-	m_buffer_size = m_period_size * _fragmentCount;
-	if ((m_buffer_size = snd_pcm_hw_params_set_buffer_size_near(pcm, hw, m_buffer_size)) < 0) {
-		_error = "Unable to set buffer size!";
+	m_periods = _fragmentCount;
+        if ((m_periods = snd_pcm_hw_params_set_periods_near(pcm, hw, m_periods, 0)) < 0) {
+		_error = "Unable to set periods!";
 		return 1;
 	}
+
 	if (snd_pcm_hw_params(pcm, hw) < 0) {
 		_error = "Unable to set hw params!";
 		return 1;
 	}
 
 	_fragmentSize = m_period_size;
+        _fragmentCount = m_periods;
 	if (m_format != SND_PCM_FORMAT_U8)
 		_fragmentSize >>= 1;
 	if (_channels > 1)
 		_fragmentSize *= _channels;
-	_fragmentCount = ((m_buffer_size + m_period_size - 1) / m_period_size);
 
 	return 0; // ok, we're ready..
 }
