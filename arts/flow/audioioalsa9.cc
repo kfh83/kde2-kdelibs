@@ -63,9 +63,10 @@ namespace Arts {
 
 class AudioIOALSA : public AudioIO, public IONotify  {
 protected:
-	int audio_read_fd;
-	int audio_write_fd;
-
+	// List of file descriptors terminated with -1
+	int *audio_write_fds;
+	int *audio_read_fds;
+		
         snd_pcm_t *m_pcm_playback;
 	snd_pcm_t *m_pcm_capture;
 	snd_pcm_format_t m_format;
@@ -76,7 +77,7 @@ protected:
         void startIO();
         int poll2iomanager(int pollTypes);
 	int setPcmParams(snd_pcm_t *pcm);
-	int watchDescriptor(snd_pcm_t *pcm);
+	int* watchDescriptors(snd_pcm_t *pcm);
 
         void notifyIO(int fd, int types);
 
@@ -122,7 +123,7 @@ AudioIOALSA::AudioIOALSA()
 	m_pcm_capture = NULL;
         inProgress = false;
         restartIOHandling = false;
-	audio_read_fd = audio_write_fd = -1;
+	audio_read_fds = NULL;  audio_write_fds = NULL;
 }
 
 bool AudioIOALSA::open()
@@ -244,6 +245,10 @@ void AudioIOALSA::close()
 		m_pcm_playback = NULL;
 	}
 	Dispatcher::the()->ioManager()->remove(this, IOType::all);
+
+	delete[] audio_read_fds;
+	delete[] audio_write_fds;
+	audio_read_fds = NULL;  audio_write_fds = NULL;
 }
 
 void AudioIOALSA::setParam(AudioParam p, int& value)
@@ -306,12 +311,15 @@ int AudioIOALSA::getParam(AudioParam p)
 
 void AudioIOALSA::startIO()
 {
+	delete[] audio_write_fds;
+	delete[] audio_read_fds;
+
         /* watch PCM file descriptor(s) */
 	if (m_pcm_playback) {
-		audio_write_fd = watchDescriptor(m_pcm_playback);
+		audio_write_fds = watchDescriptors(m_pcm_playback);
         }
 	if (m_pcm_capture) {
-		audio_read_fd = watchDescriptor(m_pcm_capture);
+		audio_read_fds = watchDescriptors(m_pcm_capture);
         }
 
 }
@@ -327,28 +335,34 @@ int AudioIOALSA::poll2iomanager(int pollTypes)
 	if(pollTypes & POLLERR)
 		types |= IOType::except;
 
-	return types | IOType::reentrant;
+	return types;
 }
 
-int AudioIOALSA::watchDescriptor(snd_pcm_t *pcm)
+int* AudioIOALSA::watchDescriptors(snd_pcm_t *pcm)
 {
-        struct pollfd pfds;
-        if (snd_pcm_poll_descriptors_count(pcm) != 1) {
-		arts_info("Can't handle more than one poll descriptor\n");
-		return -1;
-        }
-        if (snd_pcm_poll_descriptors(pcm, &pfds, 1) != 1) {
-		arts_info("Cannot get poll descriptor\n");
-		return -1;
+        struct pollfd pfd;
+	struct pollfd *pfds;
+	int *fds = 0;
+	
+	int count = snd_pcm_poll_descriptors_count(pcm);
+	if (count == 1) pfds = &pfd;
+	else pfds = new struct pollfd[count];
+	
+        if (snd_pcm_poll_descriptors(pcm, pfds, count) != count) {
+		arts_info("Cannot get poll descriptor(s)\n");
 	}
-
-        // See though the crack-fumes from the ALSA-developers and try to
-        // figure out which way this handle is supposed to be polled.
-        int types = poll2iomanager(pfds.events);
-
-        Dispatcher::the()->ioManager()->watchFD(pfds.fd, types, this);
-
-	return pfds.fd;
+        else {
+		fds = new int[count+1];
+		for(int i=0; i<count; i++) {
+	        	// Check which way this handle is supposed to be polled.
+        		int types = poll2iomanager(pfds[i].events);
+        		Dispatcher::the()->ioManager()->watchFD(pfds[i].fd, types | IOType::reentrant, this);
+			fds[i] = pfds[i].fd;
+		}
+		fds[count] = -1;
+	}
+	if (count != 1) delete[] pfds;
+	return fds;
 }
 
 int AudioIOALSA::xrun(snd_pcm_t *pcm)
@@ -400,7 +414,7 @@ int AudioIOALSA::write(void *buffer, int size)
 {
         // DMix has an annoying habit of returning instantantly on the returned
         // poll-descriptor. So we block here to avoid an infinity loop.
-        snd_pcm_wait(m_pcm_playback, 1);
+        snd_pcm_wait(m_pcm_playback, 5);
 
         int frames = snd_pcm_bytes_to_frames(m_pcm_playback, size);
 	int length;
@@ -439,9 +453,14 @@ void AudioIOALSA::notifyIO(int fd, int type)
 
 	// We can't trust the type as ALSA might have read-type events,
 	// that are really meant to be write-type event!
-        if(fd == audio_write_fd) todo |= AudioSubSystem::ioWrite;
-        if(fd == audio_read_fd) todo |= AudioSubSystem::ioRead;
-
+	if(audio_write_fds) 
+	    for(int* i=audio_write_fds; *i != -1; i++)
+	        if(fd == *i) todo |= AudioSubSystem::ioWrite;
+	
+	if(audio_read_fds) 
+	    for(int* i=audio_read_fds; *i != -1; i++)
+	        if(fd == *i) todo |= AudioSubSystem::ioRead;
+	
         if (type & IOType::except) todo |= AudioSubSystem::ioExcept;
 
         restartIOHandling = false;
