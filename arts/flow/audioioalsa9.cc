@@ -327,7 +327,7 @@ int AudioIOALSA::poll2iomanager(int pollTypes)
 	if(pollTypes & POLLERR)
 		types |= IOType::except;
 
-	return types;
+	return types | IOType::reentrant;
 }
 
 int AudioIOALSA::watchDescriptor(snd_pcm_t *pcm)
