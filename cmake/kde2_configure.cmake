@@ -145,7 +145,7 @@ function(create_kde2_config_header)
         # IA32 only
         set(HAVE_X86_SSE ON) # In 2020 for gods sake
     endif()
-    if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+    if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86$)|(X86$)")
         set(HAVE_X86_FLOAT_INT ON)
     endif()
 
