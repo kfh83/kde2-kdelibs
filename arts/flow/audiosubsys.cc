@@ -420,6 +420,7 @@ void AudioSubSystem::handleIO(int type)
 		/*
 		 * make sure that we have a fragment full of data at least
 		 */
+Rewrite:
 		while(wBuffer.size() < _fragmentSize)
 		{
 			long wbsz = wBuffer.size();
@@ -457,6 +458,9 @@ void AudioSubSystem::handleIO(int type)
 			int len = d->audioIO->write(fragment_buffer,can_write);
 			assert(len == can_write);
 		}
+
+                // If we can write a fragment more, then do so right now:
+                if (space >= _fragmentSize*2) goto Rewrite;
 	}
 
 	assert((type & ioExcept) == 0);
