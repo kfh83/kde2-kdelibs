@@ -83,6 +83,6 @@ kde2_library(libmcop
         ltdl
         dl
     COMPILE_DEFINITIONS
-        -DEXTENSION_DIR="${CMAKE_INSTALL_FULL_LIBDIR}"
+        -DEXTENSION_DIR="${CMAKE_INSTALL_FULL_LIBDIR}/kde2/"
         -DTRADER_DIR="${CMAKE_INSTALL_FULL_LIBDIR}/mcop"
     )
