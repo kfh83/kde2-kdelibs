@@ -6,7 +6,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/kde2_icon.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/kde2_utils.cmake")
 
 # The unfortunate global definitions
-add_definitions(-DQT_NO_TRANSLATION -DQT_CLEAN_NAMESPACE -DQT_NO_COMPAT -DQT_NO_ASCII_CAST)
+add_definitions(-DQT_NO_TRANSLATION -DQT_CLEAN_NAMESPACE)
 
 # Not sure if this is a good idea
 # include_directories(${KDE2_INCLUDEDIR})
