@@ -37,10 +37,10 @@ KProcIO::KProcIO ( QTextCodec *_codec)
 
   if (!codec)
   {
-     codec = QTextCodec::codecForName("ISO 8859-1");
+     codec = QTextCodec::codecForName("UTF-8");
      if (!codec)
      {
-        kdError(750) << "Can't create ISO 8859-1 codec!" << endl;
+        kdError(750) << "Can't create UTF-8 codec!" << endl;
      }
   }
 }

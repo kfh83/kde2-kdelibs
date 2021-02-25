@@ -233,7 +233,7 @@ QFont KRootProp::readFontEntry( const QString& rKey,
       if (chStr == "default")
 	  if (KGlobal::locale())
 	      chStr = KGlobal::locale()->charset();
-	  else chStr = "iso-8859-1";
+	  else chStr = "iso10646-1";
       KGlobal::charsets()->setQFont(aRetFont,chStr);
   }
   // find fifth part (weight)

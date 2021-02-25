@@ -790,9 +790,9 @@ QTextCodec *KCharsets::codecForName(const QString &n, bool &ok) const
         return codec;
     }
 
-    // could not assign a codec, let's return Latin1
+    // could not assign a codec, let's return utf8
     ok = false;
-    return QTextCodec::codecForName("iso8859-1");
+    return QTextCodec::codecForName("UTF-8");
 }
 
 

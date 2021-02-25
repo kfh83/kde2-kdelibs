@@ -188,8 +188,8 @@ KLocale::KLocale( const QString& _catalogue )
 
     if (chset.isEmpty())
     {
-        chset = QString::fromLatin1("iso-8859-1");
-        qt_set_locale_codec(QTextCodec::codecForMib(4)); // latin-1
+        chset = QString::fromLatin1("iso10646-1"); // unicode
+        qt_set_locale_codec(QTextCodec::codecForName("UTF-8"));
         // ### we should default to Qt's default, as thats always more intelligent
     }
     else

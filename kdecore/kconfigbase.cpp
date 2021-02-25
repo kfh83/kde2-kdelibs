@@ -678,7 +678,7 @@ QFont KConfigBase::readFontEntry( const char *pKey, const QFont* pDefault ) cons
         if (chStr == QString::fromLatin1("default"))
           if (KGlobal::locale())
             chStr = KGlobal::locale()->charset();
-          else chStr = "iso-8859-1";
+          else chStr = "iso10646-1";
         KGlobal::charsets()->setQFont(aRetFont,chStr);
       }
 
