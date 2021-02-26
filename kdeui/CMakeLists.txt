@@ -24,7 +24,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
 
 set(libkdeui_SRCS
     qxembed.cpp ksharedpixmap.cpp kthemestyle.cpp kurllabel.cpp knuminput.cpp

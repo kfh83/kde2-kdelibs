@@ -29,15 +29,6 @@ add_subdirectory(dcopidl)
 add_subdirectory(dcopidl2cpp)
 add_subdirectory(client)
 
-set(testdcop_SRCS
-    testdcop.cpp
-    )
-
-set(testdcopic_SRCS
-    testdcopc.c
-    dcopc.c
-    )
-
 #--------------------------------------------------------------
 # libdcop Library
 
@@ -86,15 +77,22 @@ kde2_kinit_executable(dcopserver
         kde2::DCOP X11::ICE
     )
 
-set(testdcop_SRCS testdcop.cpp)
-qt2_wrap_cpp(testdcop_SRCS
-    SOURCES
-        testdcop.h
-    )
-add_executable(testdcop
-    ${testdcop_SRCS}
-    )
-target_link_libraries(testdcop kde2::kdecore)
+if(BUILD_TESTS)
+    set(testdcopic_SRCS
+        testdcopc.c
+        dcopc.c
+        )
+
+    set(testdcop_SRCS testdcop.cpp)
+    qt2_wrap_cpp(testdcop_SRCS
+        SOURCES
+            testdcop.h
+        )
+    add_executable(testdcop
+        ${testdcop_SRCS}
+        )
+    target_link_libraries(testdcop kde2::kdecore)
+endif()
 
 #add_executable(testdcopc
 #    testdcopc.c

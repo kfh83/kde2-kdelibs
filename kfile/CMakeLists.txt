@@ -83,25 +83,27 @@ kde2_library(libkfile
         3.0.0
     )
 
-set(kfstest_SRCS
-    kfstest.cpp
-    )
+if (BUILD_TESTS)
+    set(kfstest_SRCS
+        kfstest.cpp
+        )
 
-add_executable(kfstest ${kfstest_SRCS})
+    add_executable(kfstest ${kfstest_SRCS})
 
-target_link_libraries(kfstest
-    kde2::kfile
-    )
+    target_link_libraries(kfstest
+        kde2::kfile
+        )
 
-set(kurlrequestertest_SRCS
-    kurlrequestertest.cpp
-    )
+    set(kurlrequestertest_SRCS
+        kurlrequestertest.cpp
+        )
 
-add_executable(kurlrequestertest ${kurlrequestertest_SRCS})
+    add_executable(kurlrequestertest ${kurlrequestertest_SRCS})
 
-target_link_libraries(kurlrequestertest
-    kde2::kfile
-    )
+    target_link_libraries(kurlrequestertest
+        kde2::kfile
+        )
+endif(BUILD_TESTS)
 
 install(FILES
     kpropsdlgplugin.desktop

@@ -53,7 +53,6 @@ set(libkjs_SOURCES
     regexp.cpp
     regexp_object.cpp
     string_object.cpp
-    testkjs.cpp
     types.cpp
     ustring.cpp
     ${BISON_MyParser_OUTPUTS}
@@ -100,5 +99,7 @@ if (HAVE_PCREPOSIX)
     target_link_libraries(libkjs PkgConfig::libpcreposix)
 endif()
 
-add_executable(testkjs testkjs.cpp)
-target_link_libraries(testkjs kde2::kjs)
+if(BUILD_TESTS)
+    add_executable(testkjs testkjs.cpp)
+    target_link_libraries(testkjs kde2::kjs)
+endif()
