@@ -10,6 +10,8 @@
 #include "kurifilter.h"
 #include <qdir.h>
 
+#include "config.h"
+
 void filter( const char* u, const char * expectedResult = 0, QStringList list = QStringList(), const char * abs_path = 0 )
 {
     QString a = QString::fromLatin1( u );
@@ -49,6 +51,8 @@ void filter( const char* u, const char * expectedResult = 0, QStringList list = 
 }
 
 int main(int argc, char **argv) {
+    setenv("KDEDIR", KDEDIR, 0);
+
     KAboutData aboutData("kurifiltertest", "KURIFilter Test",
                         "1.0");
 
@@ -74,13 +78,14 @@ int main(int argc, char **argv) {
     filter( "~/.kderc", QCString("file:")+QDir::homeDirPath().local8Bit()+"/.kderc", "kshorturifilter" );
 
     // SMB share test with a specific filter chosen
-    filter( "\\\\THUNDER\\", "smb:/THUNDER/", "kshorturifilter" );
-    filter( "smb://", "smb:/", "kshorturifilter" );
-    filter( "smb://THUNDER\\WORKGROUP", "smb:/THUNDER%5CWORKGROUP", "kshorturifilter" );
+    // unfortunately kshorturifilter has disabled the smb stuff
+    //filter( "\\\\THUNDER\\", "smb:/THUNDER/", "kshorturifilter" );
+    //filter( "smb://", "smb:/", "kshorturifilter" );
+    filter( "smb://THUNDER\\WORKGROUP", "smb://THUNDER%5CWORKGROUP", "kshorturifilter" );
     filter( "smb:/THUNDER/WORKGROUP", "smb:/THUNDER/WORKGROUP", "kshorturifilter" );
-    filter( "smb:///", "smb:/", "kshorturifilter" ); // use specific filter.
-    filter( "smb:", "smb:/", "kshorturifilter" ); // use specific filter.
-    filter( "smb:/", "smb:/", "kshorturifilter" ); // use specific filter.
+    //filter( "smb:///", "smb:/", "kshorturifilter" ); // use specific filter.
+    // filter( "smb:", "smb:/", "kshorturifilter" ); // use specific filter.
+    //filter( "smb:/", "smb:/", "kshorturifilter" ); // use specific filter.
 
     // IKWS test
     filter( "KDE" );
@@ -104,8 +109,11 @@ int main(int argc, char **argv) {
     // plugin will consume it, evenif the environment variable does not
     // exist. (DA)
     QCString kdedir = getenv("KDEDIR");
+    if (kdedir.right(1) != "/") {
+        kdedir += "/";
+    }
     QCString home = getenv("HOME");
-    filter( "$KDEDIR/include", QCString("file:")+kdedir+"/include" );
+    filter( "$KDEDIR/include", QCString("file:")+kdedir+"include" );
     filter( "$HOME/.kde/share", QCString("file:")+home+"/.kde/share" );
     filter( "$HOME/$KDEDIR/kdebase/kcontrol/ebrowsing" );
     filter( "$1/$2/$3" );  // can be used as bogus or valid test

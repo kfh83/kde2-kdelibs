@@ -26,28 +26,40 @@
 
 set(kio_tests
     speed
-    kioslavetest
-    kshredtest
     kdefaultprogresstest
     kclipboardtest
-    kionetrctest
+
+    # manual tests/needs test data
+    #kioslavetest
+    #kshredtest
+    #kionetrctest
     )
 
 set(ksycoca_tests
-    kiopassdlgtest
     kurifiltertest
     ksycocatest
     getalltest
-    kruntest
-    kdirwatchtest
-    ktradertest
-    kmimemagictest
     kfiltertest
     kscantest
-    kdirlistertest
-    previewtest
-    ktartest
+
+    # manual tests/needs test data
+    #kruntest
+    #kiopassdlgtest
+    #kdirlistertest
+    #previewtest
+    #kmimemagictest
+    #ktradertest
     )
+
+if (BUILD_EXAMPLES)
+    add_executable(kdirwatchtest ktartest.cpp)
+    target_link_libraries(kdirwatchtest kde2::ksycoca)
+endif()
+
+# Requires test files
+add_executable(ktartest ktartest.cpp)
+target_link_libraries(ktartest kde2::ksycoca)
+add_test(NAME ktartest COMMAND ktartest readwrite foo.tar.gz)
 
 foreach(kio_test ${kio_tests})
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${kio_test}.h)
@@ -62,6 +74,9 @@ foreach(kio_test ${kio_tests})
     target_link_libraries(${kio_test}
         kde2::kio
         )
+    add_test(NAME ${kio_test} COMMAND ${kio_test})
+    set_tests_properties(${kio_test} PROPERTIES TIMEOUT 5)
+    set_tests_properties(${kio_test} PROPERTIES ENVIRONMENT KDE_DEBUG=1)
 endforeach()
 
 foreach(ksycoca_test ${ksycoca_tests})
@@ -77,4 +92,7 @@ foreach(ksycoca_test ${ksycoca_tests})
     target_link_libraries(${ksycoca_test}
         kde2::ksycoca
         )
+    add_test(NAME ${ksycoca_test} COMMAND ${ksycoca_test})
+    set_tests_properties(${ksycoca_test} PROPERTIES TIMEOUT 5)
+    set_tests_properties(${ksycoca_test} PROPERTIES ENVIRONMENT KDE_DEBUG=1)
 endforeach()
