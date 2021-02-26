@@ -1213,6 +1213,7 @@ QPixmap KApplication::miniIcon() const
 
 KApplication::~KApplication()
 {
+  disconnect(pKStyle, SIGNAL(destroyed()), this, SLOT(kstyleDestroyed()));
   KLibLoader::cleanUp();
   KGlobal::deleteStaticDeleters();
 
