@@ -13,16 +13,13 @@ qt2_wrap_cpp(kipctest_MOC SOURCES kipctest.h)
 add_executable(kipctest kipctest.cpp ${kipctest_MOC})
 target_link_libraries(kipctest kde2::kdecore)
 
-qt2_wrap_cpp(klocaletest_MOC SOURCES klocaletest.h)
-add_executable(klocaletest klocaletest.cpp ${klocaletest_MOC})
-target_link_libraries(klocaletest kde2::kdecore)
-
 qt2_wrap_cpp(kprocesstest_MOC SOURCES kprocesstest.h)
 add_executable(kprocesstest kprocesstest.cpp ${kprocesstest_MOC})
 target_link_libraries(kprocesstest kde2::kdecore)
 
 add_executable(kdebugtest kdebugtest.cpp)
 target_link_libraries(kdebugtest kde2::kdecore)
+
 add_executable(ksimpleconfigtest ksimpleconfigtest.cpp)
 target_link_libraries(ksimpleconfigtest kde2::kdecore)
 add_executable(kurltest kurltest.cpp)
@@ -57,3 +54,40 @@ add_executable(kmdcodectest kmdcodectest.cpp)
 target_link_libraries(kmdcodectest kde2::kdecore) 
 add_executable(knotifytest knotifytest.cpp)
 target_link_libraries(knotifytest kde2::kdecore)
+
+# Manual tests/need testdata
+#add_test(kipc kipctest)
+#add_test(kdebug kdebugtest)
+#add_test(kprocess kprocesstest)
+#add_test(kmdcodec kmdcodectest)
+
+add_test(kconfig kconfigtest)
+add_test(kurl kurltest)
+add_test(kstddirs kstddirstest)
+add_test(kuniqueapp kuniqueapptest)
+add_test(kapp kapptest)
+add_test(ksock ksocktest)
+add_test(ktempfile ktempfiletest)
+add_test(krandomsequence krandomsequencetest)
+add_test(kstringhandler kstringhandlertest)
+add_test(kcmdlinearg kcmdlineargstest)
+add_test(dcopkonq dcopkonqtest)
+add_test(cplusplus cplusplustest)
+add_test(kiconloader kiconloadertest)
+add_test(knotify knotifytest)
+
+#Needs manual input
+# add_test(kresolver kresolvertest)
+
+# Extremely slow, lots of sleeping
+# add_test(simpleconfig ksimpleconfigtest)
+# add_test(kmem kmemtest)
+
+# Needs both KIDLTest_IDL and KIDLTestClient to run
+# add_test(NAME KIDL COMMAND KIDLTest)
+
+if (BUILD_EXAMPLES)
+    qt2_wrap_cpp(klocaletest_MOC SOURCES klocaletest.h)
+    add_executable(klocaletest klocaletest.cpp ${klocaletest_MOC})
+    target_link_libraries(klocaletest kde2::kdecore)
+endif()
