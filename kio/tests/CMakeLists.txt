@@ -24,75 +24,77 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set(kio_tests
-    speed
-    kdefaultprogresstest
-    kclipboardtest
+if(BUILD_TESTS)
+    set(kio_tests
+        speed
+        kdefaultprogresstest
+        kclipboardtest
 
-    # manual tests/needs test data
-    #kioslavetest
-    #kshredtest
-    #kionetrctest
-    )
+        # manual tests/needs test data
+        #kioslavetest
+        #kshredtest
+        #kionetrctest
+        )
 
-set(ksycoca_tests
-    kurifiltertest
-    ksycocatest
-    getalltest
-    kfiltertest
-    kscantest
+    set(ksycoca_tests
+        kurifiltertest
+        ksycocatest
+        getalltest
+        kfiltertest
+        kscantest
 
-    # manual tests/needs test data
-    #kruntest
-    #kiopassdlgtest
-    #kdirlistertest
-    #previewtest
-    #kmimemagictest
-    #ktradertest
-    )
+        # manual tests/needs test data
+        #kruntest
+        #kiopassdlgtest
+        #kdirlistertest
+        #previewtest
+        #kmimemagictest
+        #ktradertest
+        )
+
+    # Requires test files
+    add_executable(ktartest ktartest.cpp)
+    target_link_libraries(ktartest kde2::ksycoca)
+    add_test(NAME ktartest COMMAND ktartest readwrite foo.tar.gz)
+
+    foreach(kio_test ${kio_tests})
+        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${kio_test}.h)
+            qt2_wrap_cpp(moc_SOURCES
+                SOURCES ${kio_test}.h
+                )
+        endif()
+        add_executable(${kio_test}
+            ${kio_test}.cpp
+            ${moc_SOURCES}
+            )
+        target_link_libraries(${kio_test}
+            kde2::kio
+            )
+        add_test(NAME ${kio_test} COMMAND ${kio_test})
+        set_tests_properties(${kio_test} PROPERTIES TIMEOUT 5)
+        set_tests_properties(${kio_test} PROPERTIES ENVIRONMENT KDE_DEBUG=1)
+    endforeach()
+
+    foreach(ksycoca_test ${ksycoca_tests})
+        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${ksycoca_test}.h)
+            qt2_wrap_cpp(moc_SOURCES
+                SOURCES ${ksycoca_test}.h
+                )
+        endif()
+        add_executable(${ksycoca_test}
+            ${ksycoca_test}.cpp
+            ${moc_SOURCES}
+            )
+        target_link_libraries(${ksycoca_test}
+            kde2::ksycoca
+            )
+        add_test(NAME ${ksycoca_test} COMMAND ${ksycoca_test})
+        set_tests_properties(${ksycoca_test} PROPERTIES TIMEOUT 5)
+        set_tests_properties(${ksycoca_test} PROPERTIES ENVIRONMENT KDE_DEBUG=1)
+    endforeach()
+endif(BUILD_TESTS)
 
 if (BUILD_EXAMPLES)
     add_executable(kdirwatchtest ktartest.cpp)
     target_link_libraries(kdirwatchtest kde2::ksycoca)
 endif()
-
-# Requires test files
-add_executable(ktartest ktartest.cpp)
-target_link_libraries(ktartest kde2::ksycoca)
-add_test(NAME ktartest COMMAND ktartest readwrite foo.tar.gz)
-
-foreach(kio_test ${kio_tests})
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${kio_test}.h)
-        qt2_wrap_cpp(moc_SOURCES
-            SOURCES ${kio_test}.h
-            )
-    endif()
-    add_executable(${kio_test}
-        ${kio_test}.cpp
-        ${moc_SOURCES}
-        )
-    target_link_libraries(${kio_test}
-        kde2::kio
-        )
-    add_test(NAME ${kio_test} COMMAND ${kio_test})
-    set_tests_properties(${kio_test} PROPERTIES TIMEOUT 5)
-    set_tests_properties(${kio_test} PROPERTIES ENVIRONMENT KDE_DEBUG=1)
-endforeach()
-
-foreach(ksycoca_test ${ksycoca_tests})
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${ksycoca_test}.h)
-        qt2_wrap_cpp(moc_SOURCES
-            SOURCES ${ksycoca_test}.h
-            )
-    endif()
-    add_executable(${ksycoca_test}
-        ${ksycoca_test}.cpp
-        ${moc_SOURCES}
-        )
-    target_link_libraries(${ksycoca_test}
-        kde2::ksycoca
-        )
-    add_test(NAME ${ksycoca_test} COMMAND ${ksycoca_test})
-    set_tests_properties(${ksycoca_test} PROPERTIES TIMEOUT 5)
-    set_tests_properties(${ksycoca_test} PROPERTIES ENVIRONMENT KDE_DEBUG=1)
-endforeach()

@@ -77,22 +77,18 @@ kde2_kinit_executable(dcopserver
         kde2::DCOP X11::ICE
     )
 
-if(BUILD_TESTS)
-    set(testdcopic_SRCS
-        testdcopc.c
-        dcopc.c
-        )
-
-    set(testdcop_SRCS testdcop.cpp)
-    qt2_wrap_cpp(testdcop_SRCS
-        SOURCES
-            testdcop.h
-        )
-    add_executable(testdcop
-        ${testdcop_SRCS}
-        )
-    target_link_libraries(testdcop kde2::kdecore)
-endif()
+#if(BUILD_TESTS)
+#    set(testdcopic_SRCS
+#        testdcopc.c
+#        dcopc.c
+#        )
+#
+#    qt2_wrap_cpp(testdcop_MOC SOURCES testdcop.h)
+#    add_executable(testdcop testdcop.cpp ${testdcop_SRCS})
+#    target_link_libraries(testdcop kde2::kdecore)
+#    add_test(NAME dcop COMMAND testdcop)
+#    set_tests_properties(dcop PROPERTIES TIMEOUT 30)
+#endif()
 
 #add_executable(testdcopc
 #    testdcopc.c

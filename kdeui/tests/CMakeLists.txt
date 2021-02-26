@@ -57,413 +57,394 @@ qt2_wrap_cpp(moc_SRCS
 
 install(FILES ${global_HEADERS} DESTINATION ${KDE2_INCLUDEDIR}/kdeui)
 
-set(kaboutdialogtest_SRCS
-    kaboutdialogtest.cpp
-    )
+if(BUILD_TESTS)
+    set(khashtest_SRCS khashtest.cpp)
+    add_executable(khashtest ${moc_SRCS} ${khashtest_SRCS})
+    target_link_libraries(khashtest kde2::kdeui)
+    add_test(khash khashtest)
 
-add_executable(kaboutdialogtest ${moc_SRCS} ${kaboutdialogtest_SRCS})
+    set(kpalettetest_SRCS kpalettetest.cpp)
+    add_executable(kpalettetest ${moc_SRCS} ${kpalettetest_SRCS})
+    target_link_libraries(kpalettetest kde2::kdeui)
+    add_test(kpalette kpalettetest)
 
-target_link_libraries(kaboutdialogtest
-    kde2::kdeui
-    )
+    set(kpopuptest_SRCS kpopuptest.cpp)
+    add_executable(kpopuptest ${moc_SRCS} ${kpopuptest_SRCS})
+    target_link_libraries(kpopuptest kde2::kdeui)
+    add_test(kpopup kpopuptest)
 
-set(kblendtest_SRCS
-    kblendtest.cpp
-    )
+    set(kaccelgentest_SRCS kaccelgentest.cpp)
+    add_executable(kaccelgentest ${moc_SRCS} ${kaccelgentest_SRCS})
+    target_link_libraries(kaccelgentest kde2::kdeui)
+    add_test(kaccelgen kaccelgentest)
+endif(BUILD_TESTS)
 
-add_executable(kblendtest ${moc_SRCS} ${kblendtest_SRCS})
+if (BUILD_EXAMPLES)
+    set(kaboutdialogtest_SRCS
+        kaboutdialogtest.cpp
+        )
 
-target_link_libraries(kblendtest
-    kde2::kdeui
-    )
+    add_executable(kaboutdialogtest ${moc_SRCS} ${kaboutdialogtest_SRCS})
 
-set(kbuttonboxtest_SRCS
-    kbuttonboxtest.cpp
-    )
+    target_link_libraries(kaboutdialogtest
+        kde2::kdeui
+        )
 
-add_executable(kbuttonboxtest ${moc_SRCS} ${kbuttonboxtest_SRCS})
+    set(kblendtest_SRCS
+        kblendtest.cpp
+        )
 
-target_link_libraries(kbuttonboxtest
-    kde2::kdeui
-    )
+    add_executable(kblendtest ${moc_SRCS} ${kblendtest_SRCS})
 
-set(kcharselecttest_SRCS
-    kcharselecttest.cpp
-    )
+    target_link_libraries(kblendtest
+        kde2::kdeui
+        )
 
-add_executable(kcharselecttest ${moc_SRCS} ${kcharselecttest_SRCS})
+    set(kbuttonboxtest_SRCS
+        kbuttonboxtest.cpp
+        )
 
-target_link_libraries(kcharselecttest
-    kde2::kdeui
-    )
+    add_executable(kbuttonboxtest ${moc_SRCS} ${kbuttonboxtest_SRCS})
 
-set(kcolortest_SRCS
-    kcolortest.cpp
-    )
+    target_link_libraries(kbuttonboxtest
+        kde2::kdeui
+        )
 
-add_executable(kcolortest ${moc_SRCS} ${kcolortest_SRCS})
+    set(kcharselecttest_SRCS
+        kcharselecttest.cpp
+        )
 
-target_link_libraries(kcolortest
-    kde2::kdeui
-    )
+    add_executable(kcharselecttest ${moc_SRCS} ${kcharselecttest_SRCS})
 
-set(kcolordlgtest_SRCS
-    kcolordlgtest.cpp
-    )
+    target_link_libraries(kcharselecttest
+        kde2::kdeui
+        )
 
-add_executable(kcolordlgtest ${moc_SRCS} ${kcolordlgtest_SRCS})
+    set(kcolortest_SRCS
+        kcolortest.cpp
+        )
 
-target_link_libraries(kcolordlgtest
-    kde2::kdeui
-    )
+    add_executable(kcolortest ${moc_SRCS} ${kcolortest_SRCS})
 
-set(kcomboboxtest_SRCS
-    kcomboboxtest.cpp
-    )
+    target_link_libraries(kcolortest
+        kde2::kdeui
+        )
 
-add_executable(kcomboboxtest ${moc_SRCS} ${kcomboboxtest_SRCS})
+    set(kcolordlgtest_SRCS
+        kcolordlgtest.cpp
+        )
 
-target_link_libraries(kcomboboxtest
-    kde2::kdeui
-    )
+    add_executable(kcolordlgtest ${moc_SRCS} ${kcolordlgtest_SRCS})
 
-set(kcompletiontest_SRCS
-    kcompletiontest.cpp
-    )
+    target_link_libraries(kcolordlgtest
+        kde2::kdeui
+        )
 
-add_executable(kcompletiontest ${moc_SRCS} ${kcompletiontest_SRCS})
+    set(kcomboboxtest_SRCS
+        kcomboboxtest.cpp
+        )
 
-target_link_libraries(kcompletiontest
-    kde2::kdeui
-    )
+    add_executable(kcomboboxtest ${moc_SRCS} ${kcomboboxtest_SRCS})
 
-set(kcontainertest_SRCS
-    kcontainertest.cpp
-    )
+    target_link_libraries(kcomboboxtest
+        kde2::kdeui
+        )
 
-add_executable(kcontainertest ${moc_SRCS} ${kcontainertest_SRCS})
+    set(kcompletiontest_SRCS
+        kcompletiontest.cpp
+        )
 
-target_link_libraries(kcontainertest
-    kde2::kdeui
-    )
+    add_executable(kcompletiontest ${moc_SRCS} ${kcompletiontest_SRCS})
 
-set(kdatepicktest_SRCS
-    kdatepicktest.cpp
-    )
+    target_link_libraries(kcompletiontest
+        kde2::kdeui
+        )
 
-add_executable(kdatepicktest ${moc_SRCS} ${kdatepicktest_SRCS})
+    set(kcontainertest_SRCS
+        kcontainertest.cpp
+        )
 
-target_link_libraries(kdatepicktest
-    kde2::kdeui
-    )
+    add_executable(kcontainertest ${moc_SRCS} ${kcontainertest_SRCS})
 
-set(kdialogbasetest_SRCS
-    kdialogbasetest.cpp
-    )
+    target_link_libraries(kcontainertest
+        kde2::kdeui
+        )
 
-add_executable(kdialogbasetest ${moc_SRCS} ${kdialogbasetest_SRCS})
+    set(kdatepicktest_SRCS
+        kdatepicktest.cpp
+        )
 
-target_link_libraries(kdialogbasetest
-    kde2::kdeui
-    )
+    add_executable(kdatepicktest ${moc_SRCS} ${kdatepicktest_SRCS})
 
-set(kdockwidgetdemo_SRCS
-    kdockwidgetdemo.cpp
-    )
+    target_link_libraries(kdatepicktest
+        kde2::kdeui
+        )
 
-add_executable(kdockwidgetdemo ${moc_SRCS} ${kdockwidgetdemo_SRCS})
+    set(kdialogbasetest_SRCS
+        kdialogbasetest.cpp
+        )
 
-target_link_libraries(kdockwidgetdemo
-    kde2::kdeui
-    )
+    add_executable(kdialogbasetest ${moc_SRCS} ${kdialogbasetest_SRCS})
 
-set(kdocktabctltest_SRCS
-    kdocktabctltest.cpp
-    )
+    target_link_libraries(kdialogbasetest
+        kde2::kdeui
+        )
 
-add_executable(kdocktabctltest ${moc_SRCS} ${kdocktabctltest_SRCS})
+    set(kdockwidgetdemo_SRCS
+        kdockwidgetdemo.cpp
+        )
 
-target_link_libraries(kdocktabctltest
-    kde2::kdeui
-    )
+    add_executable(kdockwidgetdemo ${moc_SRCS} ${kdockwidgetdemo_SRCS})
 
-set(kdockwidgettest_SRCS
-    kdockwidgettest.cpp
-    )
+    target_link_libraries(kdockwidgetdemo
+        kde2::kdeui
+        )
 
-add_executable(kdockwidgettest ${moc_SRCS} ${kdockwidgettest_SRCS})
+    set(kdocktabctltest_SRCS
+        kdocktabctltest.cpp
+        )
 
-target_link_libraries(kdockwidgettest
-    kde2::kdeui
-    )
+    add_executable(kdocktabctltest ${moc_SRCS} ${kdocktabctltest_SRCS})
 
-set(kdualcolortest_SRCS
-    kdualcolortest.cpp
-    )
+    target_link_libraries(kdocktabctltest
+        kde2::kdeui
+        )
 
-add_executable(kdualcolortest ${moc_SRCS} ${kdualcolortest_SRCS})
+    set(kdockwidgettest_SRCS
+        kdockwidgettest.cpp
+        )
 
-target_link_libraries(kdualcolortest
-    kde2::kdeui
-    )
+    add_executable(kdockwidgettest ${moc_SRCS} ${kdockwidgettest_SRCS})
 
-set(keditlistboxtest_SRCS
-    keditlistboxtest.cpp
-    )
+    target_link_libraries(kdockwidgettest
+        kde2::kdeui
+        )
 
-add_executable(keditlistboxtest ${moc_SRCS} ${keditlistboxtest_SRCS})
+    set(kdualcolortest_SRCS
+        kdualcolortest.cpp
+        )
 
-target_link_libraries(keditlistboxtest
-    kde2::kdeui
-    )
+    add_executable(kdualcolortest ${moc_SRCS} ${kdualcolortest_SRCS})
 
-set(kfontdialogtest_SRCS
-    kfontdialogtest.cpp
-    )
+    target_link_libraries(kdualcolortest
+        kde2::kdeui
+        )
 
-add_executable(kfontdialogtest ${moc_SRCS} ${kfontdialogtest_SRCS})
+    set(keditlistboxtest_SRCS
+        keditlistboxtest.cpp
+        )
 
-target_link_libraries(kfontdialogtest
-    kde2::kdeui
-    )
+    add_executable(keditlistboxtest ${moc_SRCS} ${keditlistboxtest_SRCS})
 
-set(kgradienttest_SRCS
-    kgradienttest.cpp
-    )
+    target_link_libraries(keditlistboxtest
+        kde2::kdeui
+        )
 
-add_executable(kgradienttest ${moc_SRCS} ${kgradienttest_SRCS})
+    set(kfontdialogtest_SRCS
+        kfontdialogtest.cpp
+        )
 
-target_link_libraries(kgradienttest
-    kde2::kdeui
-    )
+    add_executable(kfontdialogtest ${moc_SRCS} ${kfontdialogtest_SRCS})
 
-set(khashtest_SRCS
-    khashtest.cpp
-    )
+    target_link_libraries(kfontdialogtest
+        kde2::kdeui
+        )
 
-add_executable(khashtest ${moc_SRCS} ${khashtest_SRCS})
+    set(kgradienttest_SRCS
+        kgradienttest.cpp
+        )
 
-target_link_libraries(khashtest
-    kde2::kdeui
-    )
+    add_executable(kgradienttest ${moc_SRCS} ${kgradienttest_SRCS})
 
-set(kdesattest_SRCS
-    kdesattest.cpp
-    )
+    target_link_libraries(kgradienttest
+        kde2::kdeui
+        )
 
-add_executable(kdesattest ${moc_SRCS} ${kdesattest_SRCS})
+    set(kdesattest_SRCS
+        kdesattest.cpp
+        )
 
-target_link_libraries(kdesattest
-    kde2::kdeui
-    )
+    add_executable(kdesattest ${moc_SRCS} ${kdesattest_SRCS})
 
-set(kledtest_SRCS
-    kledtest.cpp
-    )
+    target_link_libraries(kdesattest
+        kde2::kdeui
+        )
 
-add_executable(kledtest ${moc_SRCS} ${kledtest_SRCS})
+    set(kledtest_SRCS
+        kledtest.cpp
+        )
 
-target_link_libraries(kledtest
-    kde2::kdeui
-    )
+    add_executable(kledtest ${moc_SRCS} ${kledtest_SRCS})
 
-set(klineedittest_SRCS
-    klineedittest.cpp
-    )
+    target_link_libraries(kledtest
+        kde2::kdeui
+        )
 
-add_executable(klineedittest ${moc_SRCS} ${klineedittest_SRCS})
+    set(klineedittest_SRCS
+        klineedittest.cpp
+        )
 
-target_link_libraries(klineedittest
-    kde2::kdeui
-    )
+    add_executable(klineedittest ${moc_SRCS} ${klineedittest_SRCS})
 
-set(klineeditdlgtest_SRCS
-    klineeditdlgtest.cpp
-    )
+    target_link_libraries(klineedittest
+        kde2::kdeui
+        )
 
-add_executable(klineeditdlgtest ${moc_SRCS} ${klineeditdlgtest_SRCS})
+    set(klineeditdlgtest_SRCS
+        klineeditdlgtest.cpp
+        )
 
-target_link_libraries(klineeditdlgtest
-    kde2::kdeui
-    )
+    add_executable(klineeditdlgtest ${moc_SRCS} ${klineeditdlgtest_SRCS})
 
-set(kmessageboxtest_SRCS
-    kmessageboxtest.cpp
-    )
+    target_link_libraries(klineeditdlgtest
+        kde2::kdeui
+        )
 
-add_executable(kmessageboxtest ${moc_SRCS} ${kmessageboxtest_SRCS})
+    set(kmessageboxtest_SRCS
+        kmessageboxtest.cpp
+        )
 
-target_link_libraries(kmessageboxtest
-    kde2::kdeui
-    )
+    add_executable(kmessageboxtest ${moc_SRCS} ${kmessageboxtest_SRCS})
 
-set(knuminputtest_SRCS
-    knuminputtest.cpp
-    )
+    target_link_libraries(kmessageboxtest
+        kde2::kdeui
+        )
 
-add_executable(knuminputtest ${moc_SRCS} ${knuminputtest_SRCS})
+    set(knuminputtest_SRCS
+        knuminputtest.cpp
+        )
 
-target_link_libraries(knuminputtest
-    kde2::kdeui
-    )
+    add_executable(knuminputtest ${moc_SRCS} ${knuminputtest_SRCS})
 
-set(kpalettetest_SRCS
-    kpalettetest.cpp
-    )
+    target_link_libraries(knuminputtest
+        kde2::kdeui
+        )
 
-add_executable(kpalettetest ${moc_SRCS} ${kpalettetest_SRCS})
+    set(kprogresstest_SRCS
+        kprogresstest.cpp
+        )
 
-target_link_libraries(kpalettetest
-    kde2::kdeui
-    )
+    add_executable(kprogresstest ${moc_SRCS} ${kprogresstest_SRCS})
 
-set(kpopuptest_SRCS
-    kpopuptest.cpp
-    )
+    target_link_libraries(kprogresstest
+        kde2::kdeui
+        )
 
-add_executable(kpopuptest ${moc_SRCS} ${kpopuptest_SRCS})
+    set(krulertest_SRCS
+        krulertest.cpp
+        )
 
-target_link_libraries(kpopuptest
-    kde2::kdeui
-    )
+    add_executable(krulertest ${moc_SRCS} ${krulertest_SRCS})
 
-set(kprogresstest_SRCS
-    kprogresstest.cpp
-    )
+    target_link_libraries(krulertest
+        kde2::kdeui
+        )
 
-add_executable(kprogresstest ${moc_SRCS} ${kprogresstest_SRCS})
+    set(kseparatortest_SRCS
+        kseparatortest.cpp
+        )
 
-target_link_libraries(kprogresstest
-    kde2::kdeui
-    )
+    add_executable(kseparatortest ${moc_SRCS} ${kseparatortest_SRCS})
 
-set(krulertest_SRCS
-    krulertest.cpp
-    )
+    target_link_libraries(kseparatortest
+        kde2::kdeui
+        )
 
-add_executable(krulertest ${moc_SRCS} ${krulertest_SRCS})
+    set(kstatusbartest_SRCS
+        kstatusbartest.cpp
+        )
 
-target_link_libraries(krulertest
-    kde2::kdeui
-    )
+    add_executable(kstatusbartest ${moc_SRCS} ${kstatusbartest_SRCS})
 
-set(kseparatortest_SRCS
-    kseparatortest.cpp
-    )
+    target_link_libraries(kstatusbartest
+        kde2::kdeui
+        )
 
-add_executable(kseparatortest ${moc_SRCS} ${kseparatortest_SRCS})
+    set(ktabctltest_SRCS
+        ktabctltest.cpp
+        )
 
-target_link_libraries(kseparatortest
-    kde2::kdeui
-    )
+    add_executable(ktabctltest ${moc_SRCS} ${ktabctltest_SRCS})
 
-set(kstatusbartest_SRCS
-    kstatusbartest.cpp
-    )
+    target_link_libraries(ktabctltest
+        kde2::kdeui
+        )
 
-add_executable(kstatusbartest ${moc_SRCS} ${kstatusbartest_SRCS})
+    set(kunbalancedgrdtest_SRCS
+        kunbalancedgrdtest.cpp
+        )
 
-target_link_libraries(kstatusbartest
-    kde2::kdeui
-    )
+    add_executable(kunbalancedgrdtest ${moc_SRCS} ${kunbalancedgrdtest_SRCS})
 
-set(ktabctltest_SRCS
-    ktabctltest.cpp
-    )
+    target_link_libraries(kunbalancedgrdtest
+        kde2::kdeui
+        )
 
-add_executable(ktabctltest ${moc_SRCS} ${ktabctltest_SRCS})
+    set(kwindowtest_SRCS
+        kwindowtest.cpp
+        )
 
-target_link_libraries(ktabctltest
-    kde2::kdeui
-    )
+    add_executable(kwindowtest ${moc_SRCS} ${kwindowtest_SRCS})
 
-set(kunbalancedgrdtest_SRCS
-    kunbalancedgrdtest.cpp
-    )
+    target_link_libraries(kwindowtest
+        kde2::kdeui
+        )
 
-add_executable(kunbalancedgrdtest ${moc_SRCS} ${kunbalancedgrdtest_SRCS})
+    set(kwizardtest_SRCS
+        kwizardtest.cpp
+        )
 
-target_link_libraries(kunbalancedgrdtest
-    kde2::kdeui
-    )
+    add_executable(kwizardtest ${moc_SRCS} ${kwizardtest_SRCS})
 
-set(kwindowtest_SRCS
-    kwindowtest.cpp
-    )
+    target_link_libraries(kwizardtest
+        kde2::kdeui
+        )
 
-add_executable(kwindowtest ${moc_SRCS} ${kwindowtest_SRCS})
+    set(itemcontainertest_SRCS
+        itemcontainertest.cpp
+        )
 
-target_link_libraries(kwindowtest
-    kde2::kdeui
-    )
+    add_executable(itemcontainertest ${moc_SRCS} ${itemcontainertest_SRCS})
 
-set(kwizardtest_SRCS
-    kwizardtest.cpp
-    )
+    target_link_libraries(itemcontainertest
+        kde2::kdeui
+        )
 
-add_executable(kwizardtest ${moc_SRCS} ${kwizardtest_SRCS})
+    set(kpanelmenutest_SRCS
+        kpanelmenutest.cpp
+        )
+    add_executable(kpanelmenutest ${moc_SRCS} ${kpanelmenutest_SRCS})
+    target_link_libraries(kpanelmenutest
+        kde2::kdeui
+        )
 
-target_link_libraries(kwizardtest
-    kde2::kdeui
-    )
+    set(kedittest_SRCS
+        kedittest.cpp
+        )
 
-set(itemcontainertest_SRCS
-    itemcontainertest.cpp
-    )
+    add_executable(kedittest ${moc_SRCS} ${kedittest_SRCS})
 
-add_executable(itemcontainertest ${moc_SRCS} ${itemcontainertest_SRCS})
+    target_link_libraries(kedittest
+        kde2::kdeui
+        )
 
-target_link_libraries(itemcontainertest
-    kde2::kdeui
-    )
+    set(kalphaicontest_SRCS
+        kalphaicontest.cpp
+        )
 
-set(kpanelmenutest_SRCS
-    kpanelmenutest.cpp
-    )
+    add_executable(kalphaicontest ${moc_SRCS} ${kalphaicontest_SRCS})
 
-add_executable(kpanelmenutest ${moc_SRCS} ${kpanelmenutest_SRCS})
+    target_link_libraries(kalphaicontest
+        kde2::kdeui
+        )
 
-target_link_libraries(kpanelmenutest
-    kde2::kdeui
-    )
+    set(kxmlguitest_SRCS
+        kxmlguitest.cpp
+        )
 
-set(kedittest_SRCS
-    kedittest.cpp
-    )
+    add_executable(kxmlguitest ${moc_SRCS} ${kxmlguitest_SRCS})
 
-add_executable(kedittest ${moc_SRCS} ${kedittest_SRCS})
-
-target_link_libraries(kedittest
-    kde2::kdeui
-    )
-
-set(kalphaicontest_SRCS
-    kalphaicontest.cpp
-    )
-
-add_executable(kalphaicontest ${moc_SRCS} ${kalphaicontest_SRCS})
-
-target_link_libraries(kalphaicontest
-    kde2::kdeui
-    )
-
-set(kxmlguitest_SRCS
-    kxmlguitest.cpp
-    )
-
-add_executable(kxmlguitest ${moc_SRCS} ${kxmlguitest_SRCS})
-
-target_link_libraries(kxmlguitest
-    kde2::kdeui
-    )
-
-set(kaccelgentest_SRCS
-    kaccelgentest.cpp
-    )
-
-add_executable(kaccelgentest ${moc_SRCS} ${kaccelgentest_SRCS})
-
-target_link_libraries(kaccelgentest
-    kde2::kdeui
-    )
-
+    target_link_libraries(kxmlguitest
+        kde2::kdeui
+        )
+endif (BUILD_EXAMPLES)
