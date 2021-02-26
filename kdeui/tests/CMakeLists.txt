@@ -58,11 +58,6 @@ qt2_wrap_cpp(moc_SRCS
 install(FILES ${global_HEADERS} DESTINATION ${KDE2_INCLUDEDIR}/kdeui)
 
 if(BUILD_TESTS)
-    set(khashtest_SRCS khashtest.cpp)
-    add_executable(khashtest ${moc_SRCS} ${khashtest_SRCS})
-    target_link_libraries(khashtest kde2::kdeui)
-    add_test(khash khashtest)
-
     set(kpalettetest_SRCS kpalettetest.cpp)
     add_executable(kpalettetest ${moc_SRCS} ${kpalettetest_SRCS})
     target_link_libraries(kpalettetest kde2::kdeui)
@@ -80,6 +75,11 @@ if(BUILD_TESTS)
 endif(BUILD_TESTS)
 
 if (BUILD_EXAMPLES)
+    set(khashtest_SRCS khashtest.cpp)
+    add_executable(khashtest ${moc_SRCS} ${khashtest_SRCS})
+    target_link_libraries(khashtest kde2::kdeui)
+    add_test(khash khashtest)
+
     set(kaboutdialogtest_SRCS
         kaboutdialogtest.cpp
         )
