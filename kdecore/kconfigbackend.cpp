@@ -63,6 +63,7 @@ static QCString printableToString(const char *str, int l)
   }
 
   QCString result(l + 1);
+  result[l] = '\0';
   char *r = result.data();
 
   for(int i = 0; i < l;i++, str++)
@@ -107,7 +108,8 @@ static QCString printableToString(const char *str, int l)
 }
 
 static QCString stringToPrintable(const QCString& str){
-  QCString result(str.length()*2); // Maximum 2x as long as source string
+  QCString result(str.length()*2 + 1); // Maximum 2x as long as source string
+  result[str.length()*2] = '\0';
   register char *r = result.data();
   register char *s = str.data();
 
