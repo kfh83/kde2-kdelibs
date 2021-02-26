@@ -1149,7 +1149,7 @@ QImage& KImageEffect::hash(QImage &image, Lighting lite, unsigned int spacing)
         (unsigned)image.height() < 2+spacing) return image;
 
     if (lite == NorthLite || lite == SouthLite) {
-        for (y = 0 ; y < image.height(); y = y + 2 + spacing) {
+        for (y = 0 ; y < image.height() - 1; y = y + 2 + spacing) {
             for (x = 0; x < image.width(); x++) {
                 ind = x + image.width() * y;
                 data[ind] = lite==NorthLite?uHash(data[ind]):lHash(data[ind]);
@@ -1157,6 +1157,12 @@ QImage& KImageEffect::hash(QImage &image, Lighting lite, unsigned int spacing)
                 ind = ind + image.width();
                 data[ind] = lite==NorthLite?lHash(data[ind]):uHash(data[ind]);
             }
+        }
+
+        y = image.height() - 1;
+        for (x = 0; x < image.width(); x++) {
+            ind = x + image.width() * y;
+            data[ind] = lite==NorthLite?uHash(data[ind]):lHash(data[ind]);
         }
     }
 
