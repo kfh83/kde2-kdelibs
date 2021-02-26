@@ -272,7 +272,9 @@ QStringList KStringHandler::capwords( const QStringList &list )
           it++)
     {
         word = *it;
-        word = word.left(1).upper() + word.remove(0,1);
+        if (!word.isEmpty()) {
+            word[0] = word[0].upper();
+        }
 
         tmp.append( word ); // blank list to start with
     }
