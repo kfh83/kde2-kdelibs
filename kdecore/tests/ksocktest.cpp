@@ -65,45 +65,58 @@ main(int argc, char *argv[])
 
    QString host, port;
 
-   KInetSocketAddress host_address("213.203.58.36", 80);
+   KInetSocketAddress host_address("136.243.103.182", 80);
 
-   check("KInetSocketAddress(\"213.203.58.36\", 80)", host_address.pretty(), "213.203.58.36 port 80");
+   check("KInetSocketAddress(\"136.243.103.182\", 80)", host_address.pretty(), "136.243.103.182 port 80");
 
    int result = KExtendedSocket::resolve(&host_address, host, port, NI_NAMEREQD);
+   if (result < 0) {
+       printf("Resolution failed: %s (%d)\n", strerror(-result), -result);
+   }
    printf( "resolve result: %d\n", result );
-   check("KExtendedSocket::resolve() host=", host, "www.kde.org");
+   check("KExtendedSocket::resolve() host=", host, "nicoda.kde.org");
 //   check("KExtendedSocket::resolve() port=", port, "http");
    QList<KAddressInfo> list;
-   list = KExtendedSocket::lookup("www.kde.org", "http", KExtendedSocket::inetSocket);
+   list = KExtendedSocket::lookup("nicoda.kde.org", "http", KExtendedSocket::inetSocket);
+
    for(KAddressInfo *info = list.first(); info; info = list.next())
    {
       qWarning("Lookup: %s %s %s", info->address()->pretty().latin1(),
-		                   info->address()->isEqual(KInetSocketAddress("213.203.58.36", 80)) ?
+		                   info->address()->isEqual(KInetSocketAddress("136.243.103.182", 80)) ?
 				   "is equal to" : "is NOT equal to",
-				   "213.203.58.36 port 80");
+				   "136.243.103.182 port 80");
    }
-   check("KExtendedSocket::lookup()", list.first()->address()->pretty(), "213.203.58.36 port 80");
+   check("KExtendedSocket::lookup()", list.last()->address()->pretty(), "136.243.103.182 port 80");
 
 
 
    int err;
 
-   QList<KAddressInfo> cns = KExtendedSocket::lookup("www.kde.org", 0, KExtendedSocket::canonName, &err);
+   QList<KAddressInfo> cns = KExtendedSocket::lookup("nicoda.kde.org", 0, KExtendedSocket::canonName, &err);
    for (KAddressInfo *x = cns.first(); x; x = cns.next()) {
         const char *canon = x->canonname();
         qWarning( "Lookup: %s", canon ? canon : "<Null>");
    }
-   check("KExtendedSocket::lookup() canonical", cns.first()->canonname(), "www.kde.org");
+   check("KExtendedSocket::lookup() canonical", cns.first()->canonname(), "nicoda.kde.org");
 
-   KExtendedSocket * sock2 = new KExtendedSocket( "www.kde.org", 80 );
+   KExtendedSocket * sock2 = new KExtendedSocket( "nicoda.kde.org", 80 );
    check( "KExtendedSocket ctor / connect", QString::number( sock2->connect() ), "0" );
 
    printf("FD %d\n", sock2->fd());
 
    KSocketAddress* addr = KExtendedSocket::peerAddress( sock2->fd() );
-   check( "peerAddress:", addr->nodeName().latin1(), "213.203.58.36" );
+   const char *expectedAddr = addr->family() == AF_INET6 ?  "2a01:4f8:171:c9a::5" : "136.243.103.182";
 
-   check( "isEqual:", addr->isEqual(KInetSocketAddress("213.203.58.36", 80)) ? "TRUE" : "FALSE", "TRUE");
-   check( "isEqual:", addr->isEqual(KInetSocketAddress("213.203.58.36", 8080)) ? "TRUE" : "FALSE", "FALSE");
-   check( "isEqual:", addr->isCoreEqual(KInetSocketAddress("213.203.58.36", 8080)) ? "TRUE" : "FALSE", "TRUE");
+   check( "peerAddress:", addr->nodeName().latin1(),  expectedAddr);
+
+   check( "isEqual port 80:", addr->isEqual(KInetSocketAddress(expectedAddr, 80)) ? "TRUE" : "FALSE", "TRUE");
+   check( "isEqual port 8080:", addr->isEqual(KInetSocketAddress(expectedAddr, 8080)) ? "TRUE" : "FALSE", "FALSE");
+   check( "isEqual core equal port 8080:", addr->isCoreEqual(KInetSocketAddress(expectedAddr, 8080)) ? "TRUE" : "FALSE", "TRUE");
+
+   delete addr;
+   delete sock2;
+   for(KAddressInfo *info = list.first(); info; info = list.next())
+       delete info;
+   for (KAddressInfo *x = cns.first(); x; x = cns.next())
+       delete x;
 }
