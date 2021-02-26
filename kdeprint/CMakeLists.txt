@@ -24,6 +24,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if (BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
 add_subdirectory(management)
 add_subdirectory(lpdunix)
 add_subdirectory(lpd)
@@ -31,7 +35,6 @@ add_subdirectory(rlpr)
 add_subdirectory(ext)
 add_subdirectory(filters)
 add_subdirectory(pics)
-add_subdirectory(tests)
 if(CUPS_FOUND)
     #Did it ever worked ?
     #add_subdirectory(cups)

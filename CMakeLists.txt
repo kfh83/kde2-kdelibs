@@ -94,6 +94,10 @@ find_package(PkgConfig REQUIRED)
 
 find_package(Qt2 REQUIRED)
 
+if(BUILD_TESTS)
+    enable_testing()
+endif()
+
 pkg_search_module(libpcreposix IMPORTED_TARGET libpcreposix)
 if (libpcreposix_FOUND)
     set(HAVE_PCREPOSIX ON)

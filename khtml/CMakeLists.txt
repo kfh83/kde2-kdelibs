@@ -69,13 +69,12 @@ set(libkhtml_HEADERS
     )
 
 set(libkhtml_NOINST_HEADERS
-    design.h testkhtml.h testrender.h khtml_find.h khtml_ext.h khtml_pagecache.h
+    design.h khtml_find.h khtml_ext.h khtml_pagecache.h
     khtmlimage.h
     )
 
 qt2_wrap_cpp(libkhtml_SRCS
     SOURCES
-    domtreeview.h
         khtml_ext.h
         khtml_factory.h
         khtml_find.h
@@ -83,8 +82,6 @@ qt2_wrap_cpp(libkhtml_SRCS
         khtml_part.h
         khtml_run.h
         khtmlview.h
-        testkhtml.h
-        testrender.h
     )
 
 install(FILES ${libkhtml_HEADERS} DESTINATION ${KDE2_INCLUDEDIR}/khtml)
@@ -150,3 +147,20 @@ install(FILES
     )
 
 install(FILES khtml.rc khtml_browser.rc khtml_popupmenu.rc DESTINATION ${KDE2_DATADIR}/khtml)
+
+if(BUILD_EXAMPLES)
+    qt2_wrap_cpp(testkhtml_MOC SOURCES testkhtml.h testrender.h domtreeview.h)
+    add_executable(testkhtml testkhtml.cpp domtreeview.cpp ${testkhtml_MOC})
+    target_link_libraries(testkhtml kde2::khtml)
+endif()
+
+if(BUILD_TESTS)
+    qt2_wrap_cpp(testrender_MOC SOURCES testkhtml.h testrender.h domtreeview.h)
+    add_executable(testrender testrender.cpp ${testrender_MOC})
+    target_link_libraries(testrender kde2::khtml)
+    add_test(NAME render COMMAND testrender)
+
+    add_executable(testcss testcss.cpp)
+    target_link_libraries(testcss kde2::khtml)
+    add_test(NAME css COMMAND testcss)
+endif()
