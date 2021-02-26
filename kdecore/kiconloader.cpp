@@ -626,7 +626,7 @@ QPixmap KIconLoader::loadIcon(const QString& _name, int group, int size,
 
     // We only insert the image in the cache if alphaBlending is
     // being used
-    if (d->mpGroups[group].alphaBlending)
+    if (group < 0 || d->mpGroups[group].alphaBlending)
 	d->imgCache.insert(pix.serialNumber(), img);
     else
         delete img;
