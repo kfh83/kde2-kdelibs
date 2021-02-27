@@ -777,7 +777,7 @@ short RenderText::baselinePosition( bool firstLine ) const
 void RenderText::position(int x, int y, int from, int len, int width, bool reverse, bool firstLine)
 {
     // ### should not be needed!!!
-    if(len == 0 || (len == 1 && *(str->s+from) == '\n') ) return;
+    if(len == 0 || !str->s || (len == 1 && *(str->s+from) == '\n') ) return;
 
     QChar *ch;
     reverse = reverse && !style()->visuallyOrdered();
