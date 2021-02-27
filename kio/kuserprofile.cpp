@@ -89,6 +89,7 @@ void KServiceTypeProfile::initStatic()
       }
     }
   }
+  s_lstProfiles->setAutoDelete(true);
 }
 
 //static
