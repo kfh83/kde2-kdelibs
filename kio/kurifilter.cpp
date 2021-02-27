@@ -76,6 +76,7 @@ void KURIFilterData::init( const KURL& url )
     m_strIconName = QString::null;
     m_bFiltered = true;  //deprecated!!! Always returns true!
     m_bChanged = true;
+    if (d) delete d;
     d = new KURIFilterDataPrivate;
 }
 

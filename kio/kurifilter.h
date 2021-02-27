@@ -275,7 +275,7 @@ private:
     
     KURL m_pURI; 
     URITypes m_iType;
-    KURIFilterDataPrivate *d;
+    KURIFilterDataPrivate *d = NULL;
 };
 
 
