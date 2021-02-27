@@ -188,7 +188,7 @@ KLocale::KLocale( const QString& _catalogue )
 
     if (chset.isEmpty())
     {
-        chset = QString::fromLatin1("iso10646-1"); // unicode
+        chset = QString::fromLatin1("UTF-8"); // unicode
         qt_set_locale_codec(QTextCodec::codecForName("UTF-8"));
         // ### we should default to Qt's default, as thats always more intelligent
     }
@@ -199,7 +199,7 @@ KLocale::KLocale( const QString& _catalogue )
         // if !ok, we have a problem. it will return latin-1 then, but thats
         // obviously not what the user wants
         if(!ok)
-            qWarning("** Warning: charset %s is not known. using ISO 8859-1 instead.", chset.latin1());
+            qWarning("** Warning: charset %s is not known. using UTF-8 instead.", chset.latin1());
 
         // Lars said: "A utf16 locale doesn't exist. It can't interact with other Unix applications because utf16 has 0's in the string."
         if (!strcmp(nc->name(), "ISO-10646-UCS-2"))
