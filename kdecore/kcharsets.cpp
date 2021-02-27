@@ -727,7 +727,7 @@ QTextCodec *KCharsets::codecForName(const QString &n, bool &ok) const
     if (n.isEmpty()) {
         QString lc = KGlobal::locale()->charset();
         if (lc.isEmpty())
-            codec = QTextCodec::codecForName("iso8859-1");
+            codec = QTextCodec::codecForName("UTF-8");
         else
             codec = codecForName(lc);
 
