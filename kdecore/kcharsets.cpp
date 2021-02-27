@@ -34,6 +34,7 @@
 #include <qtextcodec.h>
 #include <qmap.h>
 #include <qcstring.h>
+#include <qfile.h>
 
 template class QList<QFont::CharSet>;
 
@@ -769,7 +770,11 @@ QTextCodec *KCharsets::codecForName(const QString &n, bool &ok) const
         cname = name;
     cname = cname.upper();
 
-    codec = QTextCodec::loadCharmapFile(dir + cname);
+    QString charmapPath = dir + cname;
+    if (!QFile::exists(charmapPath) && QFile::exists(charmapPath + ".gz")) {
+        charmapPath += ".gz";
+    }
+    codec = QTextCodec::loadCharmapFile(charmapPath);
 
     if(codec) {
         d->codecForNameDict.replace(name, codec);
