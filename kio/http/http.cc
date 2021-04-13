@@ -386,7 +386,7 @@ void HTTPProtocol::get( const KURL& url )
   m_request.url = url;
   m_request.passwd = url.pass();
   m_request.user = url.user();
-  m_request.do_proxy = m_bUseProxy;
+  m_request.doProxy = m_bUseProxy;
 
   retrieveContent();
 }
@@ -403,7 +403,7 @@ void HTTPProtocol::put( const KURL &url, int, bool, bool)
   m_request.query = QString::null;
   m_request.cache = CC_Reload;
   m_request.offset = 0;
-  m_request.do_proxy = m_bUseProxy;
+  m_request.doProxy = m_bUseProxy;
   m_request.url = url;
 
   retrieveContent();
@@ -421,7 +421,7 @@ void HTTPProtocol::post( const KURL& url)
   m_request.query = url.query();
   m_request.cache = CC_Reload;
   m_request.offset = 0;
-  m_request.do_proxy = m_bUseProxy;
+  m_request.doProxy = m_bUseProxy;
   m_request.url = url;
 
   retrieveContent();
@@ -532,11 +532,11 @@ void HTTPProtocol::http_checkConnection()
   if ( m_iSock != -1 )
   {
      bool closeDown = false;
-     if ( m_request.do_proxy && m_state.do_proxy )
+     if ( m_request.doProxy && m_state.doProxy )
      {
         // Keep the connection to the proxy.
      }
-     else if ( !m_state.do_proxy && !m_request.do_proxy )
+     else if ( !m_state.doProxy && !m_request.doProxy )
      {
         if (m_state.hostname != m_request.hostname)
         {
@@ -572,7 +572,7 @@ void HTTPProtocol::http_checkConnection()
   m_state.port = m_request.port;
   m_state.user = m_request.user;
   m_state.passwd = m_request.passwd;
-  m_state.do_proxy = m_request.do_proxy;
+  m_state.doProxy = m_request.doProxy;
 }
 
 bool HTTPProtocol::http_openConnection()
@@ -583,7 +583,7 @@ bool HTTPProtocol::http_openConnection()
   int errCode;
   QString errMsg;
 
-  if ( m_state.do_proxy )
+  if ( m_state.doProxy )
   {
     QString proxy_host = m_proxyURL.host();
     int proxy_port = m_proxyURL.port();
@@ -798,7 +798,7 @@ bool HTTPProtocol::http_open()
   else
   {
     // format the URI
-    if (m_state.do_proxy && !m_bIsTunneled)
+    if (m_state.doProxy && !m_bIsTunneled)
     {
       KURL u;
       u.setUser( m_state.user );
@@ -1003,7 +1003,7 @@ bool HTTPProtocol::http_open()
     }
 
     // Do we need to authorize to the proxy server ?
-    if ( m_state.do_proxy && !m_bIsTunneled )
+    if ( m_state.doProxy && !m_bIsTunneled )
       header += proxyAuthenticationHeader();
   }
 
@@ -1184,7 +1184,7 @@ bool HTTPProtocol::readHeader()
          // connections but don't tell us.
          // We will still use persistent connections if the proxy
          // sends us a "Connection: Keep-Alive" header.
-         if (m_state.do_proxy)
+         if (m_state.doProxy)
          {
             m_bKeepAlive = false;
          }
@@ -1992,7 +1992,7 @@ void HTTPProtocol::mimetype( const KURL& url )
   m_request.query = url.query();
   m_request.cache = CC_Cache;
   m_request.offset = 0;
-  m_request.do_proxy = m_bUseProxy;
+  m_request.doProxy = m_bUseProxy;
   m_request.url = url;
 
   retrieveHeader();
@@ -2656,7 +2656,7 @@ void HTTPProtocol::cache_update( const KURL& url, bool no_cache, time_t expireDa
   m_request.query = url.query();
   m_request.cache = CC_Reload;
   m_request.offset = 0;
-  m_request.do_proxy = m_bUseProxy;
+  m_request.doProxy = m_bUseProxy;
   m_request.url = url;
 
   if (no_cache)
@@ -3374,7 +3374,7 @@ void HTTPProtocol::calculateResponse( DigestAuthInfo& info, HASHHEX Response )
   if ( info.qop == "auth-int" )
   {
     authStr += ':';
-    authStr += info.entity_body;
+    authStr += info.entityBody;
   }
 //  kdDebug(7113) << "(" << getpid() << ") A2 => " << authStr << endl;
   md.reset();
@@ -3431,7 +3431,7 @@ QString HTTPProtocol::createDigestAuth ( bool isForProxy )
   if ( info.username.isEmpty() || info.password.isEmpty() || !p )
     return QString::null;
 
-  // info.entity_body = p;   // FIXME: need to have the data to be sent for POST action!!
+  // info.entityBody = p;   // FIXME: need to have the data to be sent for POST action!!
   info.realm = "";
   info.algorithm = "MD5";
   info.nonce = "";
