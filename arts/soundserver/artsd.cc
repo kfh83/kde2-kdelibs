@@ -279,7 +279,7 @@ int main(int argc, char **argv)
 	{
 		string msg = "Error while initializing the sound driver:\n";
 		msg += AudioSubSystem::the()->error();
-		arts_fatal(msg.c_str());
+		arts_fatal("%s", msg.c_str());
 		exit(1);
 	}
 

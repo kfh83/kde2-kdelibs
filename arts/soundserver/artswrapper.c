@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 /*
  * adjust_priority
@@ -74,7 +75,17 @@ void adjust_priority()
 
 int main(int argc, char **argv)
 {
-	if(argc == 2)
+	/* make sure that open/fopen and so on NEVER return 1 or 2 (stdout and stderr) */
+	if(fcntl(0, F_GETFL) == -1)
+		(void)open("/dev/null", O_RDONLY);
+
+	if(fcntl(1, F_GETFL) == -1)
+		(void)open("/dev/null", O_WRONLY);
+
+	if(fcntl(2, F_GETFL) == -1)
+		(void)open("/dev/null", O_WRONLY);
+	
+      if(argc == 2)
 	{
 		if(strcmp(argv[1],"check") == 0)
 		{
@@ -84,17 +95,15 @@ int main(int argc, char **argv)
 		}
 	}
 
+#if defined (NO_MORE_LOCAL_DOS_HOLE)
 	adjust_priority();
-
+#endif
 	/* drop root privileges if running setuid root
 	   (due to realtime priority stuff) */
 	if (geteuid() != getuid()) 
 	{
-#if defined (HAVE_SETEUID) && !defined (HAVE_SETEUID_FAKE) 
-		seteuid(getuid());
-#else
-		setreuid(-1, getuid());
-#endif
+		setgid(getgid());
+		setuid(getuid());
 	}
 
 	if(argc == 0)

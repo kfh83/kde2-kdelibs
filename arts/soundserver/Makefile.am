@@ -104,7 +104,7 @@ mcopclass_DATA = $(mcopclass_UNCONDITIONAL)
 endif
 
 install-exec-local: install-binPROGRAMS
-	@(chown root $(bindir)/artswrapper && chmod 4755 $(bindir)/artswrapper) \
+	@(chown root $(bindir)/artswrapper && chmod 755 $(bindir)/artswrapper) \
 		|| echo "please make $(bindir)/artswrapper suid root"
 
 ######## install idl typeinfo files
