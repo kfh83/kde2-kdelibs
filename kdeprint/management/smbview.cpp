@@ -120,14 +120,16 @@ void SmbView::setOpen(QListViewItem *item, bool on)
 		if (item->depth() == 0)
 		{ // opening group
 			m_current = item;
-			QString	cmd = QString("nmblookup -M %1 -S | grep '<20>' | awk '{print $1}' | xargs -iserv_name smbclient -L serv_name -W %2 %3").arg(item->text(0)).arg(item->text(0)).arg(smbPasswordString(m_login,m_password));
+			QString	cmd = QString("nmblookup -M %1 -S | grep '<20>' | awk '{print $1}' | xargs -iserv_name ").arg(KShellProcess::quote(item->text(0)));
+			cmd += QString("smbclient -L serv_name -N -W %1").arg(KShellProcess::quote(item->text(0)));
 			m_proc->setExecutable(cmd);
 			startProcess(ServerListing);
 		}
 		else if (item->depth() == 1)
 		{ // opening server
 			m_current = item;
-			QString	cmd = QString("smbclient -L %1 -W %2 %3").arg(item->text(0)).arg(item->parent()->text(0)).arg(smbPasswordString(m_login,m_password));
+			QString	cmd = QString("smbclient -L %1 ").arg(KShellProcess::quote(item->text(0)));
+			cmd += QString("-N -W %1").arg(KShellProcess::quote(item->parent()->text(0)));
 			m_proc->setExecutable(cmd);
 			startProcess(ShareListing);
 		}
