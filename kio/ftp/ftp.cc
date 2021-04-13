@@ -596,6 +596,14 @@ bool Ftp::ftpSendCmd( const QCString& cmd, char expresp, int maxretries )
 {
   assert( sControl > 0 );
 
+  if ( cmd.find( '\r' ) != -1 || cmd.find( '\n' ) != -1)
+  {
+    kdWarning(7102) << "Invalid command received (contains CR or LF): "
+                    << cmd.data() << endl;
+    error( ERR_UNSUPPORTED_ACTION, m_host );
+    return false;
+  }
+
   QCString buf = cmd;
   buf += "\r\n";
 
@@ -1677,7 +1685,10 @@ FtpEntry* Ftp::ftpParseDir( char* buffer )
                     }
                     else
                       de.link = QString::null;
-
+                      
+                    if (strchr(p_name, '/'))
+                       return 0L; // Don't trick us!
+                    
                     de.access = 0;
                     de.type = S_IFREG;
                     switch ( p_access[0] ) {
