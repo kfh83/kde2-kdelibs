@@ -983,7 +983,7 @@ void KDirOperator::insertNewFiles(const KFileItemList &newone)
     fileView->addItemList( newone );
     emit updateInformation(fileView->numDirs(), fileView->numFiles());
 
-    
+
     KFileItem *item;
     KFileItemListIterator it( newone );
     while ( (item = it.current()) ) {
@@ -1014,6 +1014,7 @@ void KDirOperator::selectDir(const KFileViewItem *item)
 
 void KDirOperator::itemDeleted(KFileItem *item)
 {
+    pendingMimeTypes.removeRef( static_cast<KFileViewItem *>( item ));
     fileView->removeItem( static_cast<KFileViewItem *>( item ));
     emit updateInformation(fileView->numDirs(), fileView->numFiles());
 }
