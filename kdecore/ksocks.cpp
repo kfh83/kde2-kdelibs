@@ -216,7 +216,8 @@ KSocks::KSocks() : _socksLib(NULL), _st(NULL), cfg(0) {
              << "/usr/local/lib/"
              << "/usr/local/socks5/lib/"
              << "/opt/socks5/lib/";
-   _libNames << "libsocks.so"                  // Dante
+   _libNames << "libsocksd.so.0"                  // Dante
+             << "libsocks.so.4"                
              << "libsocks5.so"                 // ?
              << "libsocks5_sh.so";             // NEC
 
