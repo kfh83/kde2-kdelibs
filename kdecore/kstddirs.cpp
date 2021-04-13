@@ -722,7 +722,7 @@ QString KStandardDirs::kde_default(const char *type) {
     if (!strcmp(type, "mime"))
 	return "share/mimelnk/";
     if (!strcmp(type, "cgi"))
-	return "cgi-bin/";
+	return "lib/cgi-bin/";
     if (!strcmp(type, "wallpaper"))
 	return "share/wallpapers/";
     if (!strcmp(type, "templates"))
