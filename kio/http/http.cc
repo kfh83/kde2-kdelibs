@@ -790,8 +790,30 @@ bool HTTPProtocol::http_open()
     {
       QString agent = config()->readEntry("UserAgent");
       if( !agent.isEmpty() )
-        header += "User-Agent: " + agent + "\r\n";
+      {
+        header += "User-Agent: ";
+        header += agent;
+        header += "\r\n";
+      }
     }
+
+    // Send the Host: information
+    header += "Host: ";
+    if (m_state.hostname.find(':') != -1)
+    {
+      // This is an IPv6 (not hostname)
+      header += '[';
+      header += m_state.hostname;
+      header += ']';
+    }
+    else
+    {
+      header += m_state.hostname;
+    }
+
+    if (m_state.port != m_iDefaultPort)
+      header += QString(":%1").arg(m_state.port);
+    header += "\r\n";
 
     header += proxyAuthenticationHeader();
   }
@@ -804,7 +826,10 @@ bool HTTPProtocol::http_open()
       u.setUser( m_state.user );
       u.setProtocol( m_protocol );
       u.setHost( m_state.hostname );
-      u.setPort( m_state.port );
+
+      if (m_state.port != m_iDefaultPort)
+        u.setPort( m_state.port );
+
       u.setEncodedPathAndQuery( m_request.url.encodedPathAndQuery(0,true) );
       header += u.url();
     }
@@ -830,28 +855,26 @@ bool HTTPProtocol::http_open()
     bool sendReferrer = config()->readBoolEntry("SendReferrer", true);
     if ( sendReferrer )
     {
-      QString referrer = config()->readEntry("referrer");
-      if (!referrer.isEmpty())
+      KURL referrerURL = config()->readEntry("referrer");
+      if (referrerURL.isValid())
       {
-        header += "Referer: ";
-        header += referrer;
-        header += "\r\n"; //Don't try to correct spelling!
+        // Sanitize
+        QString protocol = referrerURL.protocol();
+        
+        if ((protocol == "http") || 
+            ((protocol == "https") && (m_protocol == "https"))
+           )
+        {
+           referrerURL.setRef(QString::null);
+           referrerURL.setUser(QString::null);
+           referrerURL.setPass(QString::null);
+
+           header += "Referer: ";
+           header += referrerURL.url();
+           header += "\r\n"; //Don't try to correct spelling!
+        }
       }
     }
-
-/*
-    if ( !sendReferrer &&
-         config()->readBoolEntry("EnableReferrerWorkaround", true) )
-    {
-      // for privacy reasons we send the URL without the filename
-      KURL u = m_request.url;
-      u.setFileName( "" );
-      u.setRef( "" );
-      header += "Referer: ";
-      header += u.url();
-      header += "\r\n";
-    }
-*/
 
     // Adjust the offset value based on the "resume" meta-data.
     QString resumeOffset = config()->readEntry("resume");
