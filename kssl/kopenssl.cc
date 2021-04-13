@@ -100,6 +100,7 @@ static int (*K_SSL_CTX_use_certificate) (SSL_CTX*, X509*) = NULL;
 static int (*K_SSL_get_error) (SSL*, int) = NULL;
 static STACK_OF(X509)* (*K_SSL_get_peer_cert_chain) (SSL*) = NULL;
 static void (*K_X509_STORE_CTX_set_chain) (X509_STORE_CTX *, STACK_OF(X509)*) = NULL;
+static void (*K_X509_STORE_CTX_set_purpose) (X509_STORE_CTX *, int) = NULL;
 static void (*K_sk_free) (STACK*) = NULL;
 static int (*K_sk_num) (STACK*) = NULL;
 static char* (*K_sk_value) (STACK*, int) = NULL;
@@ -276,6 +277,7 @@ KConfig *cfg;
       K_EVP_PKEY_free = (void (*) (EVP_PKEY *)) _cryptoLib->symbol("EVP_PKEY_free");
       K_X509_STORE_CTX_set_chain = (void (*)(X509_STORE_CTX *, STACK_OF(X509)*)) _cryptoLib->symbol("X509_STORE_CTX_set_chain");
       if (!K_X509_STORE_CTX_set_chain) K_X509_STORE_CTX_set_chain = (void (*)(X509_STORE_CTX *, STACK_OF(X509)*)) _cryptoLib->symbol("X509_STORE_CTX_set0_untrusted");
+      K_X509_STORE_CTX_set_purpose = (void (*)(X509_STORE_CTX *, int)) _cryptoLib->symbol("X509_STORE_CTX_set_purpose");
       K_sk_free = (void (*) (STACK *)) _cryptoLib->symbol("OPENSSL_sk_free");
       if (!K_sk_free) K_sk_free = (void (*) (STACK *)) _cryptoLib->symbol("sk_free");
       assert(K_sk_free);
@@ -826,6 +828,9 @@ void KOpenSSLProxy::X509_STORE_CTX_set_chain(X509_STORE_CTX *v, STACK_OF(X509)* 
    if (K_X509_STORE_CTX_set_chain) (K_X509_STORE_CTX_set_chain)(v,x);
 }
 
+void KOpenSSLProxy::X509_STORE_CTX_set_purpose(X509_STORE_CTX *v, int purpose) {
+   if (K_X509_STORE_CTX_set_purpose) (K_X509_STORE_CTX_set_purpose)(v,purpose);
+}
 
 STACK* KOpenSSLProxy::sk_dup(const STACK *s) {
    if (K_sk_dup) return (K_sk_dup)(s);
