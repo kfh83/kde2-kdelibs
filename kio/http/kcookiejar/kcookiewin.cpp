@@ -153,10 +153,10 @@ KCookieWin::KCookieWin( QWidget *parent, KHttpCookie* cookie,
     QBoxLayout* bbLay = new QHBoxLayout( bbox );
     bbLay->setSpacing( KDialog::spacingHint() );
     QPushButton* btn = new QPushButton( i18n("&Accept"), bbox );
-    btn->setDefault( true );
     connect( btn, SIGNAL(clicked()), SLOT(accept()) );
     bbLay->addWidget( btn );
     btn = new QPushButton( i18n("&Reject"), bbox );
+    btn->setDefault( true );
     connect( btn, SIGNAL(clicked()), SLOT(reject()) );
     bbLay->addWidget( btn );
     bbLay->addStretch( 1 );    
