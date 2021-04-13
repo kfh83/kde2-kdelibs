@@ -276,7 +276,7 @@ static void kDebugBackend( unsigned short nLevel, unsigned int nArea, const char
           }
         case 3: // syslog
           {
-	      syslog( nPriority, data);
+	      syslog( nPriority, "%s", data);
           }
         case 4: // nothing
           {
@@ -448,7 +448,8 @@ kdbgstream &kdbgstream::form(const char *format, ...)
     char buf[4096];
     va_list arguments;
     va_start( arguments, format );
-    vsprintf( buf, format, arguments );
+    buf[sizeof(buf)-1] = '\0';
+    vsnprintf( buf, sizeof(buf)-1, format, arguments );
     va_end(arguments);
     *this << buf;
     return *this;
