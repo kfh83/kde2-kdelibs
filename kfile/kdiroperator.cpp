@@ -204,8 +204,7 @@ void KDirOperator::activatedMenu( const KFileViewItem * )
 
 void KDirOperator::updateSelectionDependentActions()
 {
-    bool hasSelection = fileView && fileView->selectedItems() &&
-                        !fileView->selectedItems()->isEmpty();
+    bool hasSelection = fileView && !fileView->selectedItems()->isEmpty();
     myActionCollection->action( "delete" )->setEnabled( hasSelection );
     myActionCollection->action( "properties")->setEnabled( hasSelection );
 }
