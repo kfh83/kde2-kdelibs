@@ -27,18 +27,26 @@ using namespace KJS;
 RegExp::RegExp(const UString &p, int f)
  : pattern(p), flags(f)
 {
+#ifdef HAVE_PCREPOSIX
+  pcre2_regcomp(&preg, p.ascii(), 0);  
+#else
 #ifdef REG_EXTENDED    
   regcomp(&preg, p.ascii(), REG_EXTENDED);
 #else
   regcomp(&preg, p.ascii(), 0);  
 #endif  
+#endif
   /* TODO use flags, check for errors */
 }
 
 RegExp::~RegExp()
 {
   /* TODO: is this really okay after an error ? */
+#ifdef HAVE_PCREPOSIX
+  pcre2_regfree(&preg);
+#else
   regfree(&preg);
+#endif
 }
 
 UString RegExp::match(const UString &s, int i, int *pos)
@@ -49,7 +57,11 @@ UString RegExp::match(const UString &s, int i, int *pos)
     i = 0;
 
   if (i > s.size() || s.isNull() ||
+#ifdef HAVE_PCREPOSIX
+      pcre2_regexec(&preg, s.ascii() + i, 10, rmatch, 0)) {
+#else
       regexec(&preg, s.ascii() + i, 10, rmatch, 0)) {
+#endif
     if (pos)
       *pos = -1;
     return UString::null;
@@ -62,7 +74,11 @@ UString RegExp::match(const UString &s, int i, int *pos)
 
 bool RegExp::test(const UString &s, int)
 {
+#ifdef HAVE_PCREPOSIX
+  int r = pcre2_regexec(&preg, s.ascii(), 0, 0, 0);
+#else
   int r = regexec(&preg, s.ascii(), 0, 0, 0);
+#endif
 
   return r == 0;
 }

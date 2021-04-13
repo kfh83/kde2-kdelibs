@@ -25,7 +25,7 @@
 #include "config.h"
 
 #ifdef HAVE_PCREPOSIX
-#include <pcreposix.h>
+#include <pcre2posix.h>
 #else  // POSIX regex - not so good...
 extern "C" { // bug with some libc5 distributions
 #include <regex.h>

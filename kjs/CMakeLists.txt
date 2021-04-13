@@ -96,7 +96,7 @@ kde2_library(libkjs
         1.0.0
     )
 if (HAVE_PCREPOSIX)
-    target_link_libraries(libkjs PkgConfig::libpcreposix)
+    target_link_libraries(libkjs PkgConfig::libpcre2posix)
 endif()
 
 if(BUILD_TESTS)
