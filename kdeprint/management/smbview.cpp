@@ -19,6 +19,9 @@
 
 #include "smbview.h"
 
+#include <config.h>
+#include <stdlib.h>
+
 #include <kprocess.h>
 #include <qheader.h>
 #include <qapplication.h>
@@ -117,6 +120,12 @@ void SmbView::setOpen(QListViewItem *item, bool on)
 {
 	if (on && item->childCount() == 0)
 	{
+		QCString oldpw = getenv("PASSWD");
+		QCString olduser = getenv("USER");
+		QCString pw = m_password.local8Bit();
+		setenv("PASSWD", pw, 1);
+		QCString user = m_login.local8Bit();
+		setenv("USER", user, 1);
 		if (item->depth() == 0)
 		{ // opening group
 			m_current = item;
@@ -133,6 +142,14 @@ void SmbView::setOpen(QListViewItem *item, bool on)
 			m_proc->setExecutable(cmd);
 			startProcess(ShareListing);
 		}
+		if (oldpw.isNull())
+		   unsetenv("PASSWD");
+		else
+		   setenv("PASSWD", oldpw, 1);
+		if (olduser.isNull())
+		   unsetenv("USER");
+		else
+		   setenv("USER", olduser, 1);
 	}
 	QListView::setOpen(item,on);
 }
