@@ -50,6 +50,8 @@
 #include <qstrlist.h>
 #include <qlist.h>
 #include <qdict.h>
+#include <qdir.h>
+#include <qregexp.h>
 
 #include <kurl.h>
 #include <krfcdate.h>
@@ -436,6 +438,12 @@ bool KCookieJar::parseURL(const QString &_url,
     _path = kurl.path();
     if (_path.isEmpty())
        _path = "/";
+
+    QRegExp exp("[\\\\/]\\.\\.[\\\\/]");
+    // Weird path, cookie stealing attempt?
+    if (exp.find(_path,0) != -1)
+       return false; // Deny everything!!
+
     return true;
 }
 
