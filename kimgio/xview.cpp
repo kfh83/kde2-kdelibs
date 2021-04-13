@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 #include <qiodevice.h>
 #include <qcolor.h>
 #include <qfile.h>
@@ -56,7 +57,11 @@ void kimgio_xv_read( QImageIO *_imageio )
 
 	// now follows a binary block of x*y bytes. 
 	int blocksize = x*y;
-	char *block = new char[ blocksize ];
+	if(x < 0 || y < 0 || blocksize < x || blocksize < y)
+		return;
+	char *block = (char*) malloc(blocksize);
+	if (!block)
+		return;
 
 	if (iodev->readBlock(block, blocksize) != blocksize ) 
 	{
@@ -65,6 +70,10 @@ void kimgio_xv_read( QImageIO *_imageio )
 
 	// Create the image
 	QImage image( x, y, 8, maxval + 1, QImage::BigEndian );
+	if( image.isNull()) {
+		free(block);
+		return;
+	}
 
 	// how do the color handling? they are absolute 24bpp
 	// or at least can be calculated as such.
@@ -107,7 +116,7 @@ void kimgio_xv_read( QImageIO *_imageio )
 	_imageio->setImage( image );
 	_imageio->setStatus( 0 );
 
-	delete [] block;
+	free(block);
 	return;
 }
 
