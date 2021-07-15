@@ -346,7 +346,7 @@ void KPixmapIO::createShmSegment(int size)
     }
 
     d->shminfo->shmaddr = (char *) shmat(d->shminfo->shmid, 0, 0);
-    if (d->shminfo->shmaddr < 0)
+    if (d->shminfo->shmaddr < (void *)-1)
     {
 	kdWarning(290) << "Could not attach shared memory segment.\n";
 	m_bShm = false;
