@@ -169,7 +169,7 @@ int build_link(const char *tmp_prefix, const char *kde_prefix)
      if (result == 0) return 0; /* Success */
      unlink(kde_tmp_dir);
      strncat(user_tmp_dir, "XXXXXX", PATH_MAX - strlen(user_tmp_dir));
-     mktemp(user_tmp_dir);
+     if (mkdtemp(user_tmp_dir)==0) return 1; /*JOWENN: isn't that the better solution ?? */
      return create_link(kde_tmp_dir, user_tmp_dir);
   }
   if ((result == -1) || (!S_ISLNK(stat_buf.st_mode)))
@@ -195,7 +195,7 @@ int build_link(const char *tmp_prefix, const char *kde_prefix)
      if (result == 0) return 0; /* Success */
      unlink(kde_tmp_dir);
      strncat(user_tmp_dir, "XXXXXX", PATH_MAX - strlen(user_tmp_dir));
-     mktemp(user_tmp_dir);
+     if (mkdtemp(user_tmp_dir)==0) return 1; /*JOWENN: isn't that the better solution ?? */
      return create_link(kde_tmp_dir, user_tmp_dir);
      return 1;
   }
@@ -203,7 +203,7 @@ int build_link(const char *tmp_prefix, const char *kde_prefix)
   if (result == 0) return 0; /* Success */
   unlink(kde_tmp_dir);
   strncat(user_tmp_dir, "XXXXXX", PATH_MAX - strlen(user_tmp_dir));
-  mktemp(user_tmp_dir);
+     if (mkdtemp(user_tmp_dir)==0) return 1; /*JOWENN: isn't that the better solution ?? */
   return create_link(kde_tmp_dir, user_tmp_dir);
 }
 
