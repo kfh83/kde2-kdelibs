@@ -724,7 +724,7 @@ FILE *startHeader(string prefix)
 	string header_name = prefix+".h.new";
 	FILE *header = fopen(header_name.c_str(),"w");
 
-	fprintf(header,generated_disclaimer);
+	fprintf(header,"%s",generated_disclaimer);
 	fprintf(header,"#ifndef %s\n",mkdef(prefix).c_str());
 	fprintf(header,"#define %s\n\n",mkdef(prefix).c_str());
 	fprintf(header,"#include \"common.h\"\n\n");
@@ -749,7 +749,7 @@ FILE *startSource(string prefix)
 	string source_name = prefix+".cc.new";
 
 	FILE *source = fopen(source_name.c_str(),"w");
-	fprintf(source,generated_disclaimer);
+	fprintf(source,"%s",generated_disclaimer);
 	fprintf(source,"#include \"%s\"\n\n",header_name.c_str());
 	fprintf(source,"#include \"common.tcc\"\n\n");
 
