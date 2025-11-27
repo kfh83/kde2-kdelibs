@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
@@ -137,16 +138,20 @@ KSycoca::KSycoca( bool /* dummy */ )
 }
 
 static KSycoca *s_sycoca_instance;
+
+// i don't think we need this given closeDatabase ? Either way im running into double-delete
+/*
 static void delete_ksycoca_self() {
   delete s_sycoca_instance;
 }
+*/
 
 KSycoca * KSycoca::self()
 {
     if (!_self) {
         _self = new KSycoca();
         s_sycoca_instance = _self;
-        qAddPostRoutine(delete_ksycoca_self);
+        //qAddPostRoutine(delete_ksycoca_self);
     }
   return _self;
 }
