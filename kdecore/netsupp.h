@@ -34,10 +34,11 @@
 #define PF_LOCAL	PF_UNIX
 #endif
 
-#ifdef CLOBBER_IN6
-#define kde_in6_addr		in6_addr
-#define kde_sockaddr_in6	sockaddr_in6
-#endif
+// This is unneeded
+//#ifdef CLOBBER_IN6
+//#define kde_in6_addr		in6_addr
+//#define kde_sockaddr_in6	sockaddr_in6
+//#endif
 
 /*** IPv6 structures that might be missing from some implementations ***/
 
