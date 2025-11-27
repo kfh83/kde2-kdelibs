@@ -200,7 +200,7 @@ endif()
 
 find_package(Cups)
 
-find_package(OpenSSL)
+find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 if(OpenSSL_FOUND)
     set(HAVE_SSL TRUE)
 else()
