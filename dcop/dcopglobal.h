@@ -36,6 +36,11 @@ extern "C" {
 #include <X11/ICE/ICEmsg.h>
 #include <X11/ICE/ICEproto.h>
 
+// Workaround for C++98 not having this. Maybe the wrong spot.
+#ifndef static_assert
+#define static_assert(expr, msg) typedef char static_assertion[(expr)?1:-1]
+#endif
+
 #ifdef __cplusplus
 }
 #endif
