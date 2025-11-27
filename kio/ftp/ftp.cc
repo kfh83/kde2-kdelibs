@@ -41,9 +41,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef TIME_WITH_SYS_TIME
-#include <time.h>
-#endif
+#include <ctime>
 
 #include <qdir.h>
 
