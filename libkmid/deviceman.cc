@@ -59,6 +59,8 @@
 #include <sys/asoundlib.h>
 #endif
 
+#include <alsa/seq.h>
+
 #if 1
 #include <kinstance.h>
 #include <kglobal.h>

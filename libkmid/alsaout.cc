@@ -53,6 +53,7 @@
 #define HAVE_ALSA_SEQ 1
 #endif
 
+#include <alsa/seq.h>
 
 SEQ_USE_EXTBUF();
 
