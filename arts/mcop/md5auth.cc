@@ -43,6 +43,8 @@
 #endif
 #endif
 
+#include <ctime>
+
 #include "md5.h"
 #include "md5auth.h"
 #include "debug.h"
