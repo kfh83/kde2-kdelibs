@@ -38,6 +38,8 @@
 #include <sys/timeb.h>
 #endif
 
+#include <ctime>
+
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
 #endif // HAVE_SYS_PARAM_H
