@@ -41,6 +41,8 @@
 #include <sys/asoundlib.h>
 #endif
 
+#include <alsa/asoundlib.h>
+
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
